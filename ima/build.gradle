@@ -1,0 +1,66 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'com.novoda.bintray-release'
+
+android {
+    compileSdkVersion COMPILE_SDK_VERSION as int
+    buildToolsVersion BUILD_TOOLS_VERSION
+
+    defaultConfig {
+        minSdkVersion MIN_SDK_VERSION as int
+        targetSdkVersion TARGET_SDK_VERSION as int
+        versionCode LIBRARY_VERSION_CODE as int
+        versionName LIBRARY_VERSION_NAME
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+}
+
+afterEvaluate {
+    tasks.findByPath(":ima:releaseAndroidJavadocs").enabled = false
+}
+
+dependencies {
+    compile project(':playermanager')
+
+    // kotlin
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
+
+    // exo player
+    compile "com.google.android.exoplayer:exoplayer:$EXO_PLAYER_VERSION"
+
+    // ad
+    compile "com.google.ads.interactivemedia.v3:interactivemedia:$IMA_VERSION"
+    compile "com.google.android.gms:play-services-ads:$PLAY_SERVICE_VERSION"
+}
+
+def getBintrayUserProperty() {
+    return hasProperty('bintrayUser') ? bintrayUser : ""
+}
+
+def getBintrayApiKeyProperty() {
+    return hasProperty('bintrayApiKey') ? bintrayApiKey : ""
+}
+
+publish {
+    userOrg = POM_DEVELOPER_ID
+    groupId = GROUP
+    artifactId = ARTIFACT_ID_IMA
+    publishVersion = LIBRARY_VERSION_NAME
+    licences = ['Apache-2.0']
+    desc = POM_DESCRIPTION
+    website = POM_URL
+    issueTracker = ISSUE_URL
+    repository = POM_SCM_URL
+    autoPublish = false
+    bintrayUser = bintrayUserProperty
+    bintrayKey = bintrayApiKeyProperty
+    dryRun = false
+}
+
+repositories {
+    mavenCentral()
+}
