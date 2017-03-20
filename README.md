@@ -70,7 +70,7 @@ playerManager.release()
 playerManager.toMute()
 
 // limit bitrate
-playerManager.setLimitBitrate((60 * 1000).toLong())
+playerManager.setMaxVideoBitrate((60 * 1000).toLong())
 
 // state listener
 playerManager.addOnStateChangedListener { playWhenReady: Boolean, playbackState: Int ->
