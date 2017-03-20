@@ -7,7 +7,7 @@ import okhttp3.OkHttpClient
  * Create data source.
  *
  * You can customize video parameters.
- * cf. [com.google.android.exoplayer2.trackselection]
+ * cf. [com.google.android.exoplayer2.trackselection.DefaultTrackSelector]
  */
 class DataSourceCreator private constructor(
         val uri: Uri,
