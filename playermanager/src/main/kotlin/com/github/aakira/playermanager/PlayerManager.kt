@@ -34,6 +34,7 @@ class PlayerManager(val context: Context, val debugLogger: Boolean = BuildConfig
     private val mainHandler = Handler()
     private var mediaSource: MediaSource? = null
     private var playerNeedsPrepare = false
+    private var trackSelector: DefaultTrackSelector? = null
 
     private val onAdaptiveMediaSourceLoadErrorListeners = ArrayList<AdaptiveMediaSourceLoadErrorListener>()
     private var onAudioCapabilitiesChangedListeners = ArrayList<AudioCapabilitiesChangedListener>()
@@ -90,7 +91,7 @@ class PlayerManager(val context: Context, val debugLogger: Boolean = BuildConfig
             onVideoRenderedListeners.forEach { listener -> listener.invoke(it) }
         }
 
-        val trackSelector = DefaultTrackSelector(AdaptiveTrackSelection.Factory(bandwidthMeter))
+        trackSelector = DefaultTrackSelector(AdaptiveTrackSelection.Factory(bandwidthMeter))
         player = ExoPlayerFactory.newSimpleInstance(context, trackSelector, DefaultLoadControl()).apply {
             addListener(eventProxy)
             setVideoListener(eventProxy)
@@ -116,6 +117,13 @@ class PlayerManager(val context: Context, val debugLogger: Boolean = BuildConfig
     fun setHlsSource(dataSourceCreator: DataSourceCreator) {
         val dataSource = buildDataSourceFactory(dataSourceCreator.userAgent, bandwidthMeter, dataSourceCreator.okHttpClient)
 
+        trackSelector?.parameters = DefaultTrackSelector.Parameters(
+                dataSourceCreator.preferredAudioLanguage, dataSourceCreator.preferredTextLanguage,
+                dataSourceCreator.allowMixedMimeAdaptiveness, dataSourceCreator.allowNonSeamlessAdaptiveness,
+                dataSourceCreator.maxVideoWidth, dataSourceCreator.maxVideoHeight, dataSourceCreator.maxVideoBitrate,
+                dataSourceCreator.exceedVideoConstraintsIfNecessary, dataSourceCreator.exceedRendererCapabilitiesIfNecessary,
+                dataSourceCreator.viewportWidth, dataSourceCreator.viewportHeight, dataSourceCreator.orientationMayChange)
+
         mediaSource = HlsMediaSource(dataSourceCreator.uri, dataSourceCreator.dataSourceCreatorInterface?.let {
             dataSourceCreator.dataSourceCreatorInterface.create(context, bandwidthMeter, dataSource)
         } ?: dataSource, mainHandler, eventProxy)
@@ -124,6 +132,13 @@ class PlayerManager(val context: Context, val debugLogger: Boolean = BuildConfig
 
     fun setExtractorMediaSource(dataSourceCreator: DataSourceCreator) {
         val dataSource = buildDataSourceFactory(dataSourceCreator.userAgent, bandwidthMeter, dataSourceCreator.okHttpClient)
+
+        trackSelector?.parameters = DefaultTrackSelector.Parameters(
+                dataSourceCreator.preferredAudioLanguage, dataSourceCreator.preferredTextLanguage,
+                dataSourceCreator.allowMixedMimeAdaptiveness, dataSourceCreator.allowNonSeamlessAdaptiveness,
+                dataSourceCreator.maxVideoWidth, dataSourceCreator.maxVideoHeight, dataSourceCreator.maxVideoBitrate,
+                dataSourceCreator.exceedVideoConstraintsIfNecessary, dataSourceCreator.exceedRendererCapabilitiesIfNecessary,
+                dataSourceCreator.viewportWidth, dataSourceCreator.viewportHeight, dataSourceCreator.orientationMayChange)
 
         mediaSource = ExtractorMediaSource(dataSourceCreator.uri, dataSourceCreator.dataSourceCreatorInterface?.let {
             dataSourceCreator.dataSourceCreatorInterface.create(context, bandwidthMeter, dataSource)
