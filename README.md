@@ -40,7 +40,7 @@ This is written in Kotlin.
 // inject from xml
 val simpleExoPlayerView: SimpleExoPlayerView by bindView(R.id.playerView)
 
-val playerManager: PlayerManager = PlayerManager(context) 
+val playerManager: ExoPlayerManager = ExoPlayerManager(context) 
 
 // inject SimpleExoPlayerView
 // https://github.com/google/ExoPlayer/blob/release-v2/library/src/main/java/com/google/android/exoplayer2/SimpleExoPlayer.java

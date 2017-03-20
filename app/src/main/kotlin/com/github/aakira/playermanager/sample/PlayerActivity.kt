@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.widget.Button
 import butterknife.bindView
 import com.github.aakira.playermanager.DataSourceCreator
-import com.github.aakira.playermanager.PlayerManager
+import com.github.aakira.playermanager.ExoPlayerManager
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView
@@ -32,7 +32,7 @@ class PlayerActivity : Activity() {
     private val reconnectButton: Button by bindView(R.id.reconnectButton)
     private val stopButton: Button by bindView(R.id.stopButton)
 
-    private val playerManager: PlayerManager by lazy(LazyThreadSafetyMode.NONE) { PlayerManager(this) }
+    private val playerManager: ExoPlayerManager by lazy(LazyThreadSafetyMode.NONE) { ExoPlayerManager(this) }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
