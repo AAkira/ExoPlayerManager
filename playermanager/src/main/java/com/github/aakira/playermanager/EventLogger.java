@@ -18,7 +18,6 @@ package com.github.aakira.playermanager;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.Surface;
-
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -48,7 +47,6 @@ import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
-
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -103,9 +101,6 @@ import java.util.Locale;
 
   @Override
   public void onTimelineChanged(Timeline timeline, Object manifest) {
-    if (timeline == null) {
-      return;
-    }
     int periodCount = timeline.getPeriodCount();
     int windowCount = timeline.getWindowCount();
     Log.d(TAG, "sourceInfo [periodCount=" + periodCount + ", windowCount=" + windowCount);
@@ -170,8 +165,8 @@ import java.util.Locale;
               printMetadata(metadata, "      ");
               Log.d(TAG, "    ]");
               break;
+            }
           }
-         }
         }
         Log.d(TAG, "  ]");
       }
@@ -363,9 +358,9 @@ import java.util.Locale;
     for (int i = 0; i < metadata.length(); i++) {
       Metadata.Entry entry = metadata.get(i);
       if (entry instanceof TextInformationFrame) {
-         TextInformationFrame textInformationFrame = (TextInformationFrame) entry;
-          Log.d(TAG, prefix + String.format("%s: value=%s", textInformationFrame.id,
-                  textInformationFrame.value));
+        TextInformationFrame textInformationFrame = (TextInformationFrame) entry;
+        Log.d(TAG, prefix + String.format("%s: value=%s", textInformationFrame.id,
+                textInformationFrame.value));
       } else if (entry instanceof UrlLinkFrame) {
         UrlLinkFrame urlLinkFrame = (UrlLinkFrame) entry;
         Log.d(TAG, prefix + String.format("%s: url=%s", urlLinkFrame.id, urlLinkFrame.url));
@@ -390,7 +385,7 @@ import java.util.Locale;
       } else if (entry instanceof EventMessage) {
         EventMessage eventMessage = (EventMessage) entry;
         Log.d(TAG, prefix + String.format("EMSG: scheme=%s, id=%d, value=%s",
-                  eventMessage.schemeIdUri, eventMessage.id, eventMessage.value));
+                eventMessage.schemeIdUri, eventMessage.id, eventMessage.value));
       }
     }
   }
