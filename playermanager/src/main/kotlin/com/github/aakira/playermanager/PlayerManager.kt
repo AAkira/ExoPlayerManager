@@ -205,8 +205,8 @@ class PlayerManager(val context: Context, val debugLogger: Boolean = BuildConfig
         player?.volume = 1f
     }
 
-    fun setLimitBitrate(bitrate: Long) {
-        bandwidthMeter.setLimitBitrate(bitrate)
+    fun setMaxVideoBitrate(maxVideoBitrate: Long) {
+        bandwidthMeter.setLimitBitrate(maxVideoBitrate)
     }
 
     fun addOnAdaptiveMediaSourceLoadErrorListener(listener: AdaptiveMediaSourceLoadErrorListener) {

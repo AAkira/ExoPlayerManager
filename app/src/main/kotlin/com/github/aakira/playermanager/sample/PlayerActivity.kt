@@ -52,7 +52,7 @@ class PlayerActivity : Activity() {
             playerManager.restartCurrentPosition()
         }
         limitBitrateButton.setOnClickListener {
-            playerManager.setLimitBitrate((60 * 1000).toLong())
+            playerManager.setMaxVideoBitrate((60 * 1000).toLong())
         }
         playerManager.addOnAudioCapabilitiesChangedListener {
 
