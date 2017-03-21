@@ -4,7 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.widget.FrameLayout
 import butterknife.bindView
-import com.github.aakira.playermanager.PlayerManager
+import com.github.aakira.playermanager.ExoPlayerManager
 import com.github.aakira.playermanager.ima.AdPlayerController
 import com.google.ads.interactivemedia.v3.api.AdErrorEvent
 import com.google.ads.interactivemedia.v3.api.AdEvent
@@ -26,7 +26,7 @@ class AdActivity : Activity() {
 
     private val adUiContainer: FrameLayout by bindView(R.id.adUiContainer)
     private val simpleExoPlayerView: SimpleExoPlayerView by bindView(R.id.player_view)
-    private val playerManager: PlayerManager by lazy(LazyThreadSafetyMode.NONE) { PlayerManager(this) }
+    private val playerManager: ExoPlayerManager by lazy(LazyThreadSafetyMode.NONE) { ExoPlayerManager(this) }
     private val adPlayerController: AdPlayerController by lazy(LazyThreadSafetyMode.NONE) {
         AdPlayerController.Builder(
                 context = this,

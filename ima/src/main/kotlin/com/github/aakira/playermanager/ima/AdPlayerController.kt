@@ -4,7 +4,7 @@ import android.content.Context
 import android.text.TextUtils
 import android.view.ViewGroup
 import com.github.aakira.playermanager.DataSourceCreator
-import com.github.aakira.playermanager.PlayerManager
+import com.github.aakira.playermanager.ExoPlayerManager
 import com.google.ads.interactivemedia.v3.api.AdErrorEvent
 import com.google.ads.interactivemedia.v3.api.AdEvent
 import com.google.ads.interactivemedia.v3.api.AdsLoader
@@ -19,7 +19,7 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView
 
 class AdPlayerController private constructor(context: Context, language: String,
-                                             userAgent: String, private val playerManager: PlayerManager,
+                                             userAgent: String, private val playerManager: ExoPlayerManager,
                                              private val adUiContainer: ViewGroup, private val companionContainer: ViewGroup?,
                                              private val companionWidth: Int, private val companionHeight: Int) {
 
@@ -29,13 +29,13 @@ class AdPlayerController private constructor(context: Context, language: String,
             val adUiContainer: ViewGroup,
             val language: String = "en",
             val userAgent: String = "UserAgent",
-            val playerManager: PlayerManager? = null,
+            val playerManager: ExoPlayerManager? = null,
             val companionContainer: ViewGroup? = null,
             val companionWidth: Int = 0,
             val companionHeight: Int = 0
     ) {
         fun create(): AdPlayerController {
-            val playerManager = playerManager ?: PlayerManager(context)
+            val playerManager = playerManager ?: ExoPlayerManager(context)
             playerManager.injectView(simpleExoPlayerView)
             return AdPlayerController(context, language, userAgent, playerManager, adUiContainer,
                     companionContainer, companionWidth, companionHeight)
