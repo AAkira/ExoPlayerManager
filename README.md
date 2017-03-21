@@ -40,7 +40,7 @@ This is written in Kotlin.
 // inject from xml
 val simpleExoPlayerView: SimpleExoPlayerView by bindView(R.id.playerView)
 
-val playerManager: PlayerManager = PlayerManager(context) 
+val playerManager: ExoPlayerManager = ExoPlayerManager(context) 
 
 // inject SimpleExoPlayerView
 // https://github.com/google/ExoPlayer/blob/release-v2/library/src/main/java/com/google/android/exoplayer2/SimpleExoPlayer.java
@@ -70,7 +70,7 @@ playerManager.release()
 playerManager.toMute()
 
 // limit bitrate
-playerManager.setLimitBitrate((60 * 1000).toLong())
+playerManager.setMaxVideoBitrate((60 * 1000).toLong())
 
 // state listener
 playerManager.addOnStateChangedListener { playWhenReady: Boolean, playbackState: Int ->
@@ -143,8 +143,8 @@ buildscript {
 }
 
 dependencies {
-	compile 'com.github.aakira:exoplayer-manager:0.0.1@aar'
-	compile 'com.github.aakira:exoplayer-manager-ima:0.0.1@aar' // if you use an IMA SDK
+	compile 'com.github.aakira:exoplayer-manager:0.0.2@aar'
+	compile 'com.github.aakira:exoplayer-manager-ima:0.0.2@aar' // if you use an IMA SDK
 }
 ```
 ## Using libraries

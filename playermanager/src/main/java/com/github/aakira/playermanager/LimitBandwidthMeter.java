@@ -1,4 +1,3 @@
-package com.github.aakira.playermanager;
 /*
  * Copyright (C) 2016 The Android Open Source Project
  *
@@ -14,6 +13,7 @@ package com.github.aakira.playermanager;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.github.aakira.playermanager;
 
 import android.os.Handler;
 import android.os.SystemClock;
