@@ -72,6 +72,9 @@ playerManager.toMute()
 // limit bitrate
 playerManager.setMaxVideoBitrate((60 * 1000).toLong())
 
+// change playback speed (speed, pitch)
+playerManager.setPlaybackParameters(2f, 2f)
+
 // state listener
 playerManager.addOnStateChangedListener { playWhenReady: Boolean, playbackState: Int ->
 }
@@ -143,8 +146,8 @@ buildscript {
 }
 
 dependencies {
-	compile 'com.github.aakira:exoplayer-manager:0.0.3@aar'
-	compile 'com.github.aakira:exoplayer-manager-ima:0.0.3@aar' // if you use an IMA SDK
+	compile 'com.github.aakira:exoplayer-manager:0.0.4@aar'
+	compile 'com.github.aakira:exoplayer-manager-ima:0.0.4@aar' // if you use an IMA SDK
 }
 ```
 ## Using libraries
