@@ -1,6 +1,7 @@
 package com.github.aakira.playermanager
 
 import com.google.android.exoplayer2.Format
+import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.audio.AudioCapabilities
 import com.google.android.exoplayer2.metadata.Metadata
 import com.google.android.exoplayer2.metadata.MetadataRenderer
@@ -22,6 +23,11 @@ typealias TracksChangedListener = (trackSelections: TrackSelectionArray) -> Unit
  * See [ExoPlayer.EventListener.onPlayerError]
  */
 typealias PlayerErrorListener = (e: Exception) -> Unit
+
+/**
+ * See [ExoPlayer.EventListener.onPlaybackParametersChanged]
+ */
+typealias PlaybackParametersChangedListener = (playbackParameters: PlaybackParameters) -> Unit
 
 /**
  * See [MetadataRenderer.Output]

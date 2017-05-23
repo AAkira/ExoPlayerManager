@@ -7,6 +7,7 @@ import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Format
+import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
@@ -40,6 +41,7 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
     private var onAudioCapabilitiesChangedListeners = ArrayList<AudioCapabilitiesChangedListener>()
     private val onExtractorMediaSourceLoadErrorListeners = ArrayList<ExtractorMediaSourceLoadErrorListener>()
     private val onMetadataListeners = ArrayList<MetadataListener>()
+    private val onPlaybackParametersListeners = ArrayList<PlaybackParametersChangedListener>()
     private val onPlayerErrorListeners = ArrayList<PlayerErrorListener>()
     private val onPlayerStateChangedListeners = ArrayList<PlayerStateChangedListener>()
     private var onTracksChangedListeners = ArrayList<TracksChangedListener>()
@@ -71,6 +73,9 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
         }
         eventProxy.onMetadataListener = {
             onMetadataListeners.forEach { listener -> listener.invoke(it) }
+        }
+        eventProxy.onPlaybackParametersChangedListener = {
+            onPlaybackParametersListeners.forEach { listener -> listener.invoke(it) }
         }
         eventProxy.onPlayerErrorListener = {
             playerNeedsPrepare = true
@@ -205,6 +210,18 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
         player?.volume = 1f
     }
 
+    /**
+     * @see [com.google.android.exoplayer2.PlaybackParameters]
+     *
+     * @param speed The factor by which playback will be sped up.
+     * @param pitch The factor by which the audio pitch will be scaled.
+     */
+    fun setPlaybackParameters(speed: Float, pitch: Float) {
+        player?.playbackParameters = PlaybackParameters(speed, pitch)
+    }
+
+    fun getPlaybackParameters() = player?.playbackParameters
+
     fun setMaxVideoBitrate(maxVideoBitrate: Long) {
         bandwidthMeter.setLimitBitrate(maxVideoBitrate)
     }
@@ -243,6 +260,18 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
 
     fun clearOnMetadataListeners() {
         onMetadataListeners.clear()
+    }
+
+    fun addOnPlaybackParametersChangedListeners(listener: PlaybackParametersChangedListener) {
+        onPlaybackParametersListeners.add(listener)
+    }
+
+    fun removePlaybackParametersChangedListeners(listener: PlaybackParametersChangedListener) {
+        onPlaybackParametersListeners.remove(listener)
+    }
+
+    fun clearPlaybackParametersChangedListeners() {
+        onPlaybackParametersListeners.clear()
     }
 
     fun addOnPlayerErrorListener(listener: PlayerErrorListener) {

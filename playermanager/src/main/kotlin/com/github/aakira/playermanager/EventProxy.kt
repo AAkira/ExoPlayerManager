@@ -4,6 +4,7 @@ import android.view.Surface
 import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Format
+import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.audio.AudioCapabilities
@@ -23,12 +24,13 @@ class EventProxy : ExoPlayer.EventListener, MetadataRenderer.Output, SimpleExoPl
         AudioCapabilitiesReceiver.Listener, AdaptiveMediaSourceEventListener,
         ExtractorMediaSource.EventListener, VideoRendererEventListener {
 
+    var onTracksChangedListener: TracksChangedListener? = null
     var onPlayerStateChangedListener: PlayerStateChangedListener? = null
     var onPlayerErrorListener: PlayerErrorListener? = null
+    var onPlaybackParametersChangedListener: PlaybackParametersChangedListener? = null
     var onMetadataListener: MetadataListener? = null
     var onVideoSizeChangedListener: VideoSizeChangedListener? = null
     var onAudioCapabilitiesChangedListener: AudioCapabilitiesChangedListener? = null
-    var onTracksChangedListener: TracksChangedListener? = null
     var onAdaptiveMediaSourceLoadErrorListener: AdaptiveMediaSourceLoadErrorListener? = null
     var onExtractorMediaSourceLoadErrorListener: ExtractorMediaSourceLoadErrorListener? = null
     var onVideoRenderedListener: VideoRenderedListener? = null
@@ -61,6 +63,11 @@ class EventProxy : ExoPlayer.EventListener, MetadataRenderer.Output, SimpleExoPl
     // ExoPlayer.EventListener
     override fun onPositionDiscontinuity() {
         // Do nothing.
+    }
+
+    // ExoPlayer.EventListener
+    override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
+        onPlaybackParametersChangedListener?.invoke(playbackParameters)
     }
 
     // MetadataRenderer.Output
