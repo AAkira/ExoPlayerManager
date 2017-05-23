@@ -27,6 +27,7 @@ class PlayerActivity : Activity() {
 
     private val simpleExoPlayerView: SimpleExoPlayerView by bindView(R.id.player_view)
     private val limitBitrateButton: Button by bindView(R.id.limitBitrateButton)
+    private val pitchButton: Button by bindView(R.id.pitchButton)
     private val playButton: Button by bindView(R.id.playButton)
     private val pauseButton: Button by bindView(R.id.pauseButton)
     private val reconnectButton: Button by bindView(R.id.reconnectButton)
@@ -39,6 +40,8 @@ class PlayerActivity : Activity() {
         setContentView(R.layout.player_activity)
 
         playerManager.injectView(simpleExoPlayerView)
+        playerManager.getPlayBackParameters()?.let { updatePitchString(it.pitch) }
+
         playButton.setOnClickListener {
             playerManager.play()
         }
@@ -53,6 +56,12 @@ class PlayerActivity : Activity() {
         }
         limitBitrateButton.setOnClickListener {
             playerManager.setMaxVideoBitrate((60 * 1000).toLong())
+        }
+        pitchButton.setOnClickListener {
+            val currentPitch = playerManager.getPlayBackParameters()?.pitch ?: return@setOnClickListener
+            (if (currentPitch > 2f) 0.4f else currentPitch + 0.2f).let {
+                playerManager.setPlaybackParameters(it, it)
+            }
         }
         playerManager.addOnAudioCapabilitiesChangedListener {
 
@@ -78,6 +87,9 @@ class PlayerActivity : Activity() {
         playerManager.addOnTracksChangedListener {
 
         }
+        playerManager.addOnPlaybackParametersChangedListeners {
+            updatePitchString(it.pitch)
+        }
 
         val dataSource = DataSourceCreator.UrlBuilder(
                 url = HLS_SAMPLE_URL,
@@ -86,26 +98,30 @@ class PlayerActivity : Activity() {
         playerManager.setHlsSource(dataSource.build())
     }
 
-    public override fun onStart() {
+    override fun onStart() {
         super.onStart()
     }
 
-    public override fun onResume() {
+    override fun onResume() {
         super.onResume()
         playerManager.play()
     }
 
-    public override fun onPause() {
+    override fun onPause() {
         super.onPause()
         playerManager.pause()
     }
 
-    public override fun onStop() {
+    override fun onStop() {
         super.onStop()
     }
 
     override fun onDestroy() {
         playerManager.release()
         super.onDestroy()
+    }
+
+    private fun updatePitchString(pitch: Float) {
+        pitchButton.text = String.format("x %.1f", pitch)
     }
 }

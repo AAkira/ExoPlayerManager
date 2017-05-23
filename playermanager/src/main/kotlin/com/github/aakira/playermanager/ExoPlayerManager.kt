@@ -202,6 +202,8 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
 
     fun getVolume() = player?.volume ?: 0f
 
+    fun getPlayBackParameters() = player?.playbackParameters
+
     fun toMute() {
         player?.volume = 0f
     }

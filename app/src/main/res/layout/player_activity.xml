@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:focusable="true"
-    android:keepScreenOn="true">
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:focusable="true"
+                android:keepScreenOn="true">
 
     <com.google.android.exoplayer2.ui.SimpleExoPlayerView
         android:id="@+id/player_view"
@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:focusable="true"
         app:surface_type="texture_view"
-        app:use_controller="false" />
+        app:use_controller="false"/>
 
     <Button
         android:id="@+id/reconnectButton"
@@ -21,7 +21,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="@dimen/margin_medium"
-        android:text="reconnect" />
+        android:text="reconnect"/>
 
     <Button
         android:id="@+id/limitBitrateButton"
@@ -30,7 +30,16 @@
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="@dimen/margin_medium"
         android:layout_toRightOf="@id/reconnectButton"
-        android:text="limit bitrate" />
+        android:text="limit bitrate"/>
+
+    <Button
+        android:id="@+id/pitchButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="@dimen/margin_medium"
+        android:layout_toRightOf="@id/limitBitrateButton"
+        />
 
     <Button
         android:id="@+id/playButton"
@@ -39,7 +48,7 @@
         android:layout_above="@id/reconnectButton"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="@dimen/margin_medium"
-        android:text="play" />
+        android:text="play"/>
 
     <Button
         android:id="@+id/pauseButton"
@@ -48,7 +57,7 @@
         android:layout_above="@id/reconnectButton"
         android:layout_marginLeft="@dimen/margin_medium"
         android:layout_toRightOf="@id/playButton"
-        android:text="pause" />
+        android:text="pause"/>
 
     <Button
         android:id="@+id/stopButton"
@@ -57,5 +66,5 @@
         android:layout_above="@id/reconnectButton"
         android:layout_marginLeft="@dimen/margin_medium"
         android:layout_toRightOf="@id/pauseButton"
-        android:text="stop" />
+        android:text="stop"/>
 </RelativeLayout>
