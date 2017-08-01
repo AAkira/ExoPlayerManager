@@ -8,6 +8,7 @@ import com.github.aakira.playermanager.ExoPlayerManager
 import com.github.aakira.playermanager.ima.AdPlayerController
 import com.google.ads.interactivemedia.v3.api.AdErrorEvent
 import com.google.ads.interactivemedia.v3.api.AdEvent
+import com.google.ads.interactivemedia.v3.api.UiElement
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView
 import com.google.android.exoplayer2.util.Util
 
@@ -34,14 +35,15 @@ class AdActivity : Activity() {
                 adUiContainer = adUiContainer,
                 language = "us",
                 userAgent = Util.getUserAgent(this, "UserAgent"),
-                playerManager = playerManager)
-                .create()
+                playerManager = playerManager
+        ).create()
     }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.ad_activity)
 
+        adPlayerController.adsRenderingSettings.setUiElements(hashSetOf(UiElement.AD_ATTRIBUTION, UiElement.COUNTDOWN))
         adPlayerController.addAdEventListener(AdEvent.AdEventListener {
 
         })
