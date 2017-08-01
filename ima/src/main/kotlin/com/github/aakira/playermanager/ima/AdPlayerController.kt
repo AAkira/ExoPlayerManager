@@ -72,22 +72,23 @@ class AdPlayerController private constructor(context: Context, language: String,
         playerManager.addOnStateChangedListener { playWhenReady: Boolean, playbackState: Int ->
             if (!isAdDisplayed) return@addOnStateChangedListener
 
-            if (playbackState == ExoPlayer.STATE_ENDED) {
-                for (callback in adCallbacks) {
-                    callback.onEnded()
+            when (playbackState) {
+                ExoPlayer.STATE_READY -> {
+                    if (playWhenReady) {
+                        for (callback in adCallbacks) {
+                            callback.onPlay()
+                            callback.onResume()
+                        }
+                    } else {
+                        for (callback in adCallbacks) {
+                            callback.onPause()
+                        }
+                    }
                 }
-                return@addOnStateChangedListener
-            }
-            if (playbackState != ExoPlayer.STATE_READY) {
-                return@addOnStateChangedListener
-            }
-            if (playWhenReady) {
-                for (callback in adCallbacks) {
-                    callback.onPlay()
-                }
-            } else {
-                for (callback in adCallbacks) {
-                    callback.onPause()
+                ExoPlayer.STATE_ENDED -> {
+                    for (callback in adCallbacks) {
+                        callback.onEnded()
+                    }
                 }
             }
         }
@@ -127,7 +128,7 @@ class AdPlayerController private constructor(context: Context, language: String,
             }
 
             override fun resumeAd() {
-                playAd()
+                // Deprecated this method
             }
 
             override fun addCallback(videoAdPlayerCallback: VideoAdPlayer.VideoAdPlayerCallback) {
