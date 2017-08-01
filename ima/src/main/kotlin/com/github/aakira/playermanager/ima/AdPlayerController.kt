@@ -9,6 +9,7 @@ import com.google.ads.interactivemedia.v3.api.AdErrorEvent
 import com.google.ads.interactivemedia.v3.api.AdEvent
 import com.google.ads.interactivemedia.v3.api.AdsLoader
 import com.google.ads.interactivemedia.v3.api.AdsManager
+import com.google.ads.interactivemedia.v3.api.AdsRenderingSettings
 import com.google.ads.interactivemedia.v3.api.CompanionAdSlot
 import com.google.ads.interactivemedia.v3.api.ImaSdkFactory
 import com.google.ads.interactivemedia.v3.api.ImaSdkSettings
@@ -18,10 +19,13 @@ import com.google.ads.interactivemedia.v3.api.player.VideoProgressUpdate
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView
 
-class AdPlayerController private constructor(context: Context, language: String,
-                                             userAgent: String, private val playerManager: ExoPlayerManager,
-                                             private val adUiContainer: ViewGroup, private val companionContainer: ViewGroup?,
-                                             private val companionWidth: Int, private val companionHeight: Int) {
+class AdPlayerController private constructor(
+        context: Context, language: String, userAgent: String,
+        val adsRenderingSettings: AdsRenderingSettings,
+        private val playerManager: ExoPlayerManager, private val adUiContainer: ViewGroup,
+        private val companionContainer: ViewGroup?, private val companionWidth: Int,
+        private val companionHeight: Int, private val sdkFactory: ImaSdkFactory
+) {
 
     data class Builder(
             val context: Context,
@@ -37,8 +41,11 @@ class AdPlayerController private constructor(context: Context, language: String,
         fun create(): AdPlayerController {
             val playerManager = playerManager ?: ExoPlayerManager(context)
             playerManager.injectView(simpleExoPlayerView)
-            return AdPlayerController(context, language, userAgent, playerManager, adUiContainer,
-                    companionContainer, companionWidth, companionHeight)
+            val sdkFactory: ImaSdkFactory = ImaSdkFactory.getInstance()
+            return AdPlayerController(context, language, userAgent,
+                    sdkFactory.createAdsRenderingSettings(), playerManager, adUiContainer,
+                    companionContainer, companionWidth, companionHeight, sdkFactory
+            )
         }
     }
 
@@ -58,7 +65,6 @@ class AdPlayerController private constructor(context: Context, language: String,
         private set
     private val videoAdPlayer: VideoAdPlayer
     private val contentProgressProvider: ContentProgressProvider
-    private val sdkFactory: ImaSdkFactory = ImaSdkFactory.getInstance()
     private val adsLoader: AdsLoader
     private val adCallbacks = ArrayList<VideoAdPlayer.VideoAdPlayerCallback>(1)
     private val adEventListeners = ArrayList<AdEvent.AdEventListener>()
@@ -196,7 +202,7 @@ class AdPlayerController private constructor(context: Context, language: String,
             for (l in adErrorListeners) {
                 adsManager?.addAdErrorListener(l)
             }
-            adsManager?.init()
+            adsManager?.init(adsRenderingSettings)
         }
     }
 
