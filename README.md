@@ -146,8 +146,8 @@ buildscript {
 }
 
 dependencies {
-	compile 'com.github.aakira:exoplayer-manager:0.0.5@aar'
-	compile 'com.github.aakira:exoplayer-manager-ima:0.0.5@aar' // if you use an IMA SDK
+	compile 'com.github.aakira:exoplayer-manager:0.0.6@aar'
+	compile 'com.github.aakira:exoplayer-manager-ima:0.0.6@aar' // if you use an IMA SDK
 }
 ```
 ## Using libraries
