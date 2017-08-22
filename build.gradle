@@ -10,7 +10,7 @@ buildscript {
     // Using libraries
 
     // Base libraries
-    ext.KOTLIN_VERSION="1.1.2"
+    ext.KOTLIN_VERSION="1.1.4"
     ext.EXO_PLAYER_VERSION="r2.4.4"
     ext.IMA_VERSION="3.7.2"
 
