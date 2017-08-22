@@ -10,24 +10,29 @@ import com.google.android.exoplayer2.upstream.DataSpec
 import java.io.IOException
 
 /**
- * See [ExoPlayer.EventListener.onPlayerStateChanged]
+ * See [com.google.android.exoplayer2.Player.EventListener.onPlayerStateChanged]
  */
 typealias PlayerStateChangedListener = (playWhenReady: Boolean, playbackState: Int) -> Unit
 
 /**
- * See [ExoPlayer.EventListener.onTracksChanged]
+ * See [com.google.android.exoplayer2.Player.EventListener.onTracksChanged]
  */
 typealias TracksChangedListener = (trackSelections: TrackSelectionArray) -> Unit
 
 /**
- * See [ExoPlayer.EventListener.onPlayerError]
+ * See [com.google.android.exoplayer2.Player.EventListener.onPlayerError]
  */
 typealias PlayerErrorListener = (e: Exception) -> Unit
 
 /**
- * See [ExoPlayer.EventListener.onPlaybackParametersChanged]
+ * See [com.google.android.exoplayer2.Player.EventListener.onPlaybackParametersChanged]
  */
 typealias PlaybackParametersChangedListener = (playbackParameters: PlaybackParameters) -> Unit
+
+/**
+ * See [com.google.android.exoplayer2.Player.EventListener.onRepeatModeChanged]
+ */
+typealias RepeatModeChangedListener = (repeatMode: Int) -> Unit
 
 /**
  * See [MetadataRenderer.Output]
@@ -35,17 +40,17 @@ typealias PlaybackParametersChangedListener = (playbackParameters: PlaybackParam
 typealias MetadataListener = (metadata: Metadata) -> Unit
 
 /**
- * See [VideoRendererEventListener.onVideoSizeChanged]
+ * See [com.google.android.exoplayer2.video.VideoRendererEventListener.onVideoSizeChanged]
  */
 typealias VideoSizeChangedListener = (width: Int, height: Int, unappliedRotationDegrees: Int,
                                       pixelWidthHeightRatio: Float) -> Unit
 /**
- * See [AudioCapabilitiesReceiver.Listener.onAudioCapabilitiesChanged]
+ * See [com.google.android.exoplayer2.audio.AudioCapabilitiesReceiver.Listener.onAudioCapabilitiesChanged]
  */
 typealias AudioCapabilitiesChangedListener = (AudioCapabilities) -> Unit
 
 /**
- * See [AdaptiveMediaSourceEventListener.onLoadError]
+ * See [com.google.android.exoplayer2.source.AdaptiveMediaSourceEventListener.onLoadError]
  */
 typealias AdaptiveMediaSourceLoadErrorListener = (dataSpec: DataSpec?, dataType: Int, trackType: Int,
                                                   trackFormat: Format?, trackSelectionReason: Int,
@@ -55,12 +60,12 @@ typealias AdaptiveMediaSourceLoadErrorListener = (dataSpec: DataSpec?, dataType:
                                                   error: IOException?, wasCanceled: Boolean) -> Unit
 
 /**
- * See [ExtractorMediaSource.EventListener]
+ * See [com.google.android.exoplayer2.source.ExtractorMediaSource.EventListener]
  */
 typealias ExtractorMediaSourceLoadErrorListener = (error: IOException) -> Unit
 
 /**
- * See [VideoRendererEventListener.onVideoEnabled]
- * See [VideoRendererEventListener.onVideoDisabled]
+ * See [com.google.android.exoplayer2.video.VideoRendererEventListener.onVideoEnabled]
+ * See [com.google.android.exoplayer2.video.VideoRendererEventListener.onVideoDisabled]
  */
 typealias VideoRenderedListener = (enable: Boolean) -> Unit

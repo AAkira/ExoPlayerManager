@@ -2,9 +2,9 @@ package com.github.aakira.playermanager
 
 import android.view.Surface
 import com.google.android.exoplayer2.ExoPlaybackException
-import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.PlaybackParameters
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.audio.AudioCapabilities
@@ -20,7 +20,7 @@ import com.google.android.exoplayer2.upstream.DataSpec
 import com.google.android.exoplayer2.video.VideoRendererEventListener
 import java.io.IOException
 
-class EventProxy : ExoPlayer.EventListener, MetadataRenderer.Output, SimpleExoPlayer.VideoListener,
+class EventProxy : Player.EventListener, MetadataRenderer.Output, SimpleExoPlayer.VideoListener,
         AudioCapabilitiesReceiver.Listener, AdaptiveMediaSourceEventListener,
         ExtractorMediaSource.EventListener, VideoRendererEventListener {
 
@@ -28,6 +28,7 @@ class EventProxy : ExoPlayer.EventListener, MetadataRenderer.Output, SimpleExoPl
     var onPlayerStateChangedListener: PlayerStateChangedListener? = null
     var onPlayerErrorListener: PlayerErrorListener? = null
     var onPlaybackParametersChangedListener: PlaybackParametersChangedListener? = null
+    var onRepeatModeChangedListener: RepeatModeChangedListener? = null
     var onMetadataListener: MetadataListener? = null
     var onVideoSizeChangedListener: VideoSizeChangedListener? = null
     var onAudioCapabilitiesChangedListener: AudioCapabilitiesChangedListener? = null
@@ -35,39 +36,44 @@ class EventProxy : ExoPlayer.EventListener, MetadataRenderer.Output, SimpleExoPl
     var onExtractorMediaSourceLoadErrorListener: ExtractorMediaSourceLoadErrorListener? = null
     var onVideoRenderedListener: VideoRenderedListener? = null
 
-    // ExoPlayer.EventListener
+    // Player.EventListener
     override fun onTimelineChanged(timeline: Timeline, manifest: Any?) {
         // Do nothing.
     }
 
-    // ExoPlayer.EventListener
+    // Player.EventListener
     override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
         this.onTracksChangedListener?.invoke(trackSelections)
     }
 
-    // ExoPlayer.EventListener
+    // Player.EventListener
     override fun onLoadingChanged(isLoading: Boolean) {
         // Do nothing.
     }
 
-    // ExoPlayer.EventListener
+    // Player.EventListener
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
         onPlayerStateChangedListener?.invoke(playWhenReady, playbackState)
     }
 
-    // ExoPlayer.EventListener
+    // Player.EventListener
     override fun onPlayerError(error: ExoPlaybackException) {
         onPlayerErrorListener?.invoke(error)
     }
 
-    // ExoPlayer.EventListener
+    // Player.EventListener
     override fun onPositionDiscontinuity() {
         // Do nothing.
     }
 
-    // ExoPlayer.EventListener
+    // Player.EventListener
     override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
         onPlaybackParametersChangedListener?.invoke(playbackParameters)
+    }
+
+    // Player.EventListener
+    override fun onRepeatModeChanged(repeatMode: Int) {
+        onRepeatModeChangedListener?.invoke(repeatMode)
     }
 
     // MetadataRenderer.Output

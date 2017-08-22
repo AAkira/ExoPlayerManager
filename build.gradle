@@ -16,7 +16,7 @@ buildscript {
 
     // Base libraries
     ext.KOTLIN_VERSION = "1.1.4"
-    ext.EXO_PLAYER_VERSION = "r2.4.4"
+    ext.EXO_PLAYER_VERSION = "r2.5.1"
     ext.IMA_VERSION = "3.7.2"
 
     // Others
@@ -43,6 +43,7 @@ allprojects {
         jcenter()
         // kotterknife snapshots
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        maven { url "https://maven.google.com" }
     }
 }
 
