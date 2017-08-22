@@ -44,16 +44,16 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
     private val onPlaybackParametersListeners = ArrayList<PlaybackParametersChangedListener>()
     private val onPlayerErrorListeners = ArrayList<PlayerErrorListener>()
     private val onPlayerStateChangedListeners = ArrayList<PlayerStateChangedListener>()
+    private val onRepeatModeChangedListeners = ArrayList<RepeatModeChangedListener>()
     private var onTracksChangedListeners = ArrayList<TracksChangedListener>()
     private val onVideoSizeChangedListeners = ArrayList<VideoSizeChangedListener>()
     private val onVideoRenderedListeners = ArrayList<VideoRenderedListener>()
 
     init {
-        eventProxy.onAdaptiveMediaSourceLoadErrorListener = {
-            dataSpec: DataSpec?, dataType: Int, trackType: Int, trackFormat: Format?,
-            trackSelectionReason: Int, trackSelectionData: Any?,
-            mediaStartTimeMs: Long, mediaEndTimeMs: Long, elapsedRealtimeMs: Long,
-            loadDurationMs: Long, bytesLoaded: Long, error: IOException?, wasCanceled: Boolean ->
+        eventProxy.onAdaptiveMediaSourceLoadErrorListener = { dataSpec: DataSpec?, dataType: Int, trackType: Int, trackFormat: Format?,
+                                                              trackSelectionReason: Int, trackSelectionData: Any?,
+                                                              mediaStartTimeMs: Long, mediaEndTimeMs: Long, elapsedRealtimeMs: Long,
+                                                              loadDurationMs: Long, bytesLoaded: Long, error: IOException?, wasCanceled: Boolean ->
 
             onAdaptiveMediaSourceLoadErrorListeners.forEach {
                 it.invoke(dataSpec, dataType, trackType, trackFormat, trackSelectionReason,
@@ -83,6 +83,9 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
         }
         eventProxy.onPlayerStateChangedListener = { playWhenReady: Boolean, playbackState: Int ->
             onPlayerStateChangedListeners.forEach { it.invoke(playWhenReady, playbackState) }
+        }
+        eventProxy.onRepeatModeChangedListener = {
+            onRepeatModeChangedListeners.forEach { listener -> listener.invoke(it) }
         }
         eventProxy.onTracksChangedListener = {
             onTracksChangedListeners.forEach { listener -> listener.invoke(it) }
@@ -274,6 +277,18 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
 
     fun clearPlaybackParametersChangedListeners() {
         onPlaybackParametersListeners.clear()
+    }
+
+    fun addOnRepeatModeChangedListeners(listener: RepeatModeChangedListener) {
+        onRepeatModeChangedListeners.add(listener)
+    }
+
+    fun removeRepeatModeChangedListeners(listener: RepeatModeChangedListener) {
+        onRepeatModeChangedListeners.remove(listener)
+    }
+
+    fun clearRepeatModeChangedListeners() {
+        onRepeatModeChangedListeners.clear()
     }
 
     fun addOnPlayerErrorListener(listener: PlayerErrorListener) {
