@@ -33,7 +33,7 @@
         android:text="limit bitrate"/>
 
     <Button
-        android:id="@+id/pitchButton"
+        android:id="@+id/playBackSpeedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
