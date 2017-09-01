@@ -4,10 +4,12 @@ import android.content.Context
 import android.os.Handler
 import com.google.android.exoplayer2.BuildConfig
 import com.google.android.exoplayer2.DefaultLoadControl
+import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.PlaybackParameters
+import com.google.android.exoplayer2.RenderersFactory
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
@@ -100,7 +102,8 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
         }
 
         trackSelector = DefaultTrackSelector(AdaptiveTrackSelection.Factory(bandwidthMeter))
-        player = ExoPlayerFactory.newSimpleInstance(context, trackSelector, DefaultLoadControl()).apply {
+        val renderersFactory: RenderersFactory = DefaultRenderersFactory(context)
+        player = ExoPlayerFactory.newSimpleInstance(renderersFactory, trackSelector, DefaultLoadControl()).apply {
             addListener(eventProxy)
             setVideoListener(eventProxy)
             setMetadataOutput(eventProxy)
