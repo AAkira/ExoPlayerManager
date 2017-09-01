@@ -27,7 +27,7 @@ class PlayerActivity : Activity() {
 
     private val simpleExoPlayerView: SimpleExoPlayerView by bindView(R.id.player_view)
     private val limitBitrateButton: Button by bindView(R.id.limitBitrateButton)
-    private val pitchButton: Button by bindView(R.id.pitchButton)
+    private val playBackSpeedButton: Button by bindView(R.id.playBackSpeedButton)
     private val playButton: Button by bindView(R.id.playButton)
     private val pauseButton: Button by bindView(R.id.pauseButton)
     private val reconnectButton: Button by bindView(R.id.reconnectButton)
@@ -40,7 +40,7 @@ class PlayerActivity : Activity() {
         setContentView(R.layout.player_activity)
 
         playerManager.injectView(simpleExoPlayerView)
-        playerManager.getPlayBackParameters()?.let { updatePitchString(it.pitch) }
+        playerManager.getPlayBackParameters()?.let { updatePlayBackSpeedString(it.speed) }
 
         playButton.setOnClickListener {
             playerManager.play()
@@ -57,10 +57,10 @@ class PlayerActivity : Activity() {
         limitBitrateButton.setOnClickListener {
             playerManager.setMaxVideoBitrate((60 * 1000).toLong())
         }
-        pitchButton.setOnClickListener {
-            val currentPitch = playerManager.getPlayBackParameters()?.pitch ?: return@setOnClickListener
-            (if (currentPitch > 2f) 0.4f else currentPitch + 0.2f).let {
-                playerManager.setPlaybackParameters(it, it)
+        playBackSpeedButton.setOnClickListener {
+            val currentSpeed = playerManager.getPlayBackParameters()?.speed ?: return@setOnClickListener
+            (if (currentSpeed > 2f) 0.4f else currentSpeed + 0.2f).let {
+                playerManager.setPlaybackParameters(it, 1f)
             }
         }
         playerManager.addOnAudioCapabilitiesChangedListener {
@@ -88,7 +88,7 @@ class PlayerActivity : Activity() {
 
         }
         playerManager.addOnPlaybackParametersChangedListeners {
-            updatePitchString(it.pitch)
+            updatePlayBackSpeedString(it.speed)
         }
 
         val dataSource = DataSourceCreator.UrlBuilder(
@@ -121,7 +121,7 @@ class PlayerActivity : Activity() {
         super.onDestroy()
     }
 
-    private fun updatePitchString(pitch: Float) {
-        pitchButton.text = String.format("x %.1f", pitch)
+    private fun updatePlayBackSpeedString(speed: Float) {
+        playBackSpeedButton.text = String.format("x %.1f", speed)
     }
 }
