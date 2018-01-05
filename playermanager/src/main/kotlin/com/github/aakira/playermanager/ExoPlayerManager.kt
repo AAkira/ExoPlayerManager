@@ -127,6 +127,7 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
 
         trackSelector?.parameters = DefaultTrackSelector.Parameters(
                 dataSourceCreator.preferredAudioLanguage, dataSourceCreator.preferredTextLanguage,
+                dataSourceCreator.selectUndeterminedTextLanguage, dataSourceCreator.forceLowestBitrate,
                 dataSourceCreator.allowMixedMimeAdaptiveness, dataSourceCreator.allowNonSeamlessAdaptiveness,
                 dataSourceCreator.maxVideoWidth, dataSourceCreator.maxVideoHeight, dataSourceCreator.maxVideoBitrate,
                 dataSourceCreator.exceedVideoConstraintsIfNecessary, dataSourceCreator.exceedRendererCapabilitiesIfNecessary,
@@ -143,6 +144,7 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
 
         trackSelector?.parameters = DefaultTrackSelector.Parameters(
                 dataSourceCreator.preferredAudioLanguage, dataSourceCreator.preferredTextLanguage,
+                dataSourceCreator.selectUndeterminedTextLanguage, dataSourceCreator.forceLowestBitrate,
                 dataSourceCreator.allowMixedMimeAdaptiveness, dataSourceCreator.allowNonSeamlessAdaptiveness,
                 dataSourceCreator.maxVideoWidth, dataSourceCreator.maxVideoHeight, dataSourceCreator.maxVideoBitrate,
                 dataSourceCreator.exceedVideoConstraintsIfNecessary, dataSourceCreator.exceedRendererCapabilitiesIfNecessary,

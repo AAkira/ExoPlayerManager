@@ -32,6 +32,6 @@ private fun getDecoderCountersBufferCountString(counters: DecoderCounters): Stri
     counters.ensureUpdated()
     return " rb:" + counters.renderedOutputBufferCount +
             " sb:" + counters.skippedOutputBufferCount +
-            " db:" + counters.droppedOutputBufferCount +
-            " mcdb:" + counters.maxConsecutiveDroppedOutputBufferCount
+            " db:" + counters.droppedBufferCount +
+            " mcdb:" + counters.maxConsecutiveDroppedBufferCount
 }

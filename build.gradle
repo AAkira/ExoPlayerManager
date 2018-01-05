@@ -7,20 +7,20 @@ buildscript {
     ext.LIBRARY_VERSION_NAME = "0.0.7"
 
     // App information
-    ext.COMPILE_SDK_VERSION = 25
-    ext.BUILD_TOOLS_VERSION = "25.0.0"
+    ext.COMPILE_SDK_VERSION = 27
+    ext.BUILD_TOOLS_VERSION = "27.0.2"
     ext.MIN_SDK_VERSION = 16
     ext.TARGET_SDK_VERSION = 25
 
     // Using libraries
 
     // Base libraries
-    ext.KOTLIN_VERSION = "1.1.4"
-    ext.EXO_PLAYER_VERSION = "r2.5.1"
+    ext.KOTLIN_VERSION = "1.2.10"
+    ext.EXO_PLAYER_VERSION = "2.6.1"
     ext.IMA_VERSION = "3.7.2"
 
     // Others
-    ext.APP_COMPAT_VERSION = "25.4.0"
+    ext.APP_COMPAT_VERSION = "27.0.2"
     ext.PLAY_SERVICE_VERSION = "11.2.0"
     ext.KOTTER_KNIFE_VERSION = "0.1.0-SNAPSHOT"
     ext.TIMBER_VERSION = "4.3.1@aar"
@@ -29,9 +29,9 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.1'
+        classpath 'com.android.tools.build:gradle:3.0.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$KOTLIN_VERSION"
-        classpath 'com.novoda:bintray-release:0.4.0'
+        classpath 'com.novoda:bintray-release:0.5.0'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
