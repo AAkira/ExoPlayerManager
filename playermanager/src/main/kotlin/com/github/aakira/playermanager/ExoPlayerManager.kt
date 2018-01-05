@@ -133,9 +133,13 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
                 dataSourceCreator.exceedVideoConstraintsIfNecessary, dataSourceCreator.exceedRendererCapabilitiesIfNecessary,
                 dataSourceCreator.viewportWidth, dataSourceCreator.viewportHeight, dataSourceCreator.orientationMayChange)
 
-        mediaSource = HlsMediaSource(dataSourceCreator.uri, dataSourceCreator.dataSourceCreatorInterface?.let {
-            dataSourceCreator.dataSourceCreatorInterface.create(context, bandwidthMeter, dataSource)
-        } ?: dataSource, mainHandler, eventProxy)
+        mediaSource = HlsMediaSource.Factory(
+                dataSourceCreator.dataSourceCreatorInterface?.let {
+                    dataSourceCreator.dataSourceCreatorInterface.create(context, bandwidthMeter, dataSource)
+                } ?: dataSource
+        )
+                .createMediaSource(dataSourceCreator.uri, mainHandler, eventProxy)
+
         playerNeedsPrepare = true
     }
 
@@ -150,9 +154,14 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
                 dataSourceCreator.exceedVideoConstraintsIfNecessary, dataSourceCreator.exceedRendererCapabilitiesIfNecessary,
                 dataSourceCreator.viewportWidth, dataSourceCreator.viewportHeight, dataSourceCreator.orientationMayChange)
 
-        mediaSource = ExtractorMediaSource(dataSourceCreator.uri, dataSourceCreator.dataSourceCreatorInterface?.let {
-            dataSourceCreator.dataSourceCreatorInterface.create(context, bandwidthMeter, dataSource)
-        } ?: dataSource, DefaultExtractorsFactory(), mainHandler, eventProxy)
+        mediaSource = ExtractorMediaSource.Factory(
+                dataSourceCreator.dataSourceCreatorInterface?.let {
+                    dataSourceCreator.dataSourceCreatorInterface.create(context, bandwidthMeter, dataSource)
+                } ?: dataSource
+        )
+                .setExtractorsFactory(DefaultExtractorsFactory())
+                .createMediaSource(dataSourceCreator.uri, mainHandler, eventProxy)
+
         playerNeedsPrepare = true
     }
 
