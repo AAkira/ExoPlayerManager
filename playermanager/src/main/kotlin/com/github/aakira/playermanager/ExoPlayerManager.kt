@@ -3,10 +3,10 @@ package com.github.aakira.playermanager
 import android.content.Context
 import android.os.Handler
 import com.google.android.exoplayer2.BuildConfig
-import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.PlaybackParameters
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
@@ -205,7 +205,7 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
 
     fun isPlaying() = player?.playWhenReady ?: false
 
-    fun getPlaybackState() = player?.playbackState ?: ExoPlayer.STATE_IDLE
+    fun getPlaybackState() = player?.playbackState ?: Player.STATE_IDLE
 
     fun getVolume() = player?.volume ?: 0f
 

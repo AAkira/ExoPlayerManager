@@ -16,7 +16,7 @@ import com.google.ads.interactivemedia.v3.api.ImaSdkSettings
 import com.google.ads.interactivemedia.v3.api.player.ContentProgressProvider
 import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer
 import com.google.ads.interactivemedia.v3.api.player.VideoProgressUpdate
-import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView
 
 class AdPlayerController private constructor(
@@ -79,7 +79,7 @@ class AdPlayerController private constructor(
             if (!isAdDisplayed) return@addOnStateChangedListener
 
             when (playbackState) {
-                ExoPlayer.STATE_READY -> {
+                Player.STATE_READY -> {
                     if (playWhenReady) {
                         for (callback in adCallbacks) {
                             callback.onPlay()
@@ -91,7 +91,7 @@ class AdPlayerController private constructor(
                         }
                     }
                 }
-                ExoPlayer.STATE_ENDED -> {
+                Player.STATE_ENDED -> {
                     for (callback in adCallbacks) {
                         callback.onEnded()
                     }
@@ -105,8 +105,8 @@ class AdPlayerController private constructor(
                 callback.onError()
             }
         }
-        playerManager.addOnExtractorMediaSourceLoadErrorListener {
-            if (!isAdDisplayed) return@addOnExtractorMediaSourceLoadErrorListener
+        playerManager.addOnMediaSourceLoadErrorListener { _, _, _, _, _, _, _, _, _, _, _, _, _ ->
+            if (!isAdDisplayed) return@addOnMediaSourceLoadErrorListener
 
             for (callback in adCallbacks) {
                 callback.onError()
