@@ -77,16 +77,17 @@ class DataSourceCreator private constructor(
             val selectUndeterminedTextLanguage: Boolean = false,
             val forceLowestBitrate: Boolean = false
     ) {
-        fun build(): DataSourceCreator = DataSourceCreator(Uri.parse(url), userAgent, preferredAudioLanguage,
+        fun build(): DataSourceCreator = UriBuilder(Uri.parse(url), userAgent, preferredAudioLanguage,
                 preferredTextLanguage, allowMixedMimeAdaptiveness, allowNonSeamlessAdaptiveness,
                 maxVideoWidth, maxVideoHeight, maxVideoBitrate, exceedVideoConstraintsIfNecessary,
                 exceedRendererCapabilitiesIfNecessary, viewportWidth, viewportHeight, orientationMayChange,
                 okHttpClient, dataSourceCreatorInterface, selectUndeterminedTextLanguage, forceLowestBitrate)
+                .build()
     }
 
     /**
      * @param uri The video uri
-     * @param userAgent [@see]
+     * @param userAgent Your user agent
      * @param preferredAudioLanguage The preferred language for audio, as well as for forced text
      *     tracks as defined by RFC 5646. {@code null} to select the default track, or first track
      *     if there's no default.
