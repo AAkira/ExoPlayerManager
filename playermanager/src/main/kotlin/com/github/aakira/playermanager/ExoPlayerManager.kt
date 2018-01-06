@@ -3,7 +3,6 @@ package com.github.aakira.playermanager
 import android.content.Context
 import android.os.Handler
 import com.google.android.exoplayer2.BuildConfig
-import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Format
@@ -100,18 +99,18 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
         }
 
         trackSelector = DefaultTrackSelector(AdaptiveTrackSelection.Factory(bandwidthMeter))
-        player = ExoPlayerFactory.newSimpleInstance(context, trackSelector, DefaultLoadControl()).apply {
+        player = ExoPlayerFactory.newSimpleInstance(context, trackSelector).apply {
             addListener(eventProxy)
-            setVideoListener(eventProxy)
-            setMetadataOutput(eventProxy)
-            setVideoDebugListener(eventProxy)
+            addVideoListener(eventProxy)
+            addMetadataOutput(eventProxy)
+            addVideoDebugListener(eventProxy)
 
             if (debugLogger) {
                 EventLogger(trackSelector).let {
                     addListener(it)
-                    setAudioDebugListener(it)
-                    setVideoDebugListener(it)
-                    setMetadataOutput(it)
+                    addAudioDebugListener(it)
+                    addVideoDebugListener(it)
+                    addMetadataOutput(it)
                 }
             }
         }
@@ -167,7 +166,7 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
 
     fun release() {
         player?.release()
-        player?.removeListener(eventProxy)
+        clearExoPlayerListeners()
         player = null
     }
 
@@ -372,6 +371,26 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
 
     fun clearVideoRenderedListeners() {
         onVideoRenderedListeners.clear()
+    }
+
+    private fun clearExoPlayerListeners() {
+        player?.run {
+            removeListener(eventProxy)
+            removeVideoListener(eventProxy)
+            removeMetadataOutput(eventProxy)
+            removeVideoDebugListener(eventProxy)
+        }
+
+        if (debugLogger) {
+            player?.run {
+                EventLogger(trackSelector).let {
+                    removeListener(it)
+                    removeAudioDebugListener(it)
+                    removeVideoDebugListener(it)
+                    removeMetadataOutput(it)
+                }
+            }
+        }
     }
 
     private fun buildDataSourceFactory(userAgent: String,
