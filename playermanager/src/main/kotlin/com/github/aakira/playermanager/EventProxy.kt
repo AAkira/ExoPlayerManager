@@ -42,7 +42,7 @@ class EventProxy : Player.EventListener,
     var onMetadataListener: MetadataListener? = null
     var onVideoSizeChangedListener: VideoSizeChangedListener? = null
     var onAudioCapabilitiesChangedListener: AudioCapabilitiesChangedListener? = null
-    var onAdaptiveMediaSourceLoadErrorListener: AdaptiveMediaSourceLoadErrorListener? = null //TODO rename
+    var onMediaSourceLoadErrorListener: MediaSourceLoadErrorListener? = null
     var onExtractorMediaSourceLoadErrorListener: ExtractorMediaSourceLoadErrorListener? = null //TODO remove
     var onVideoRenderedListener: VideoRenderedListener? = null
 
@@ -154,7 +154,7 @@ class EventProxy : Player.EventListener,
                              trackSelectionReason: Int, trackSelectionData: Any?, mediaStartTimeMs: Long,
                              mediaEndTimeMs: Long, elapsedRealtimeMs: Long, loadDurationMs: Long,
                              bytesLoaded: Long, error: IOException?, wasCanceled: Boolean) {
-        onAdaptiveMediaSourceLoadErrorListener?.invoke(dataSpec, dataType, trackType, trackFormat,
+        onMediaSourceLoadErrorListener?.invoke(dataSpec, dataType, trackType, trackFormat,
                 trackSelectionReason, trackSelectionData, mediaStartTimeMs,
                 mediaEndTimeMs, elapsedRealtimeMs, loadDurationMs,
                 bytesLoaded, error, wasCanceled)

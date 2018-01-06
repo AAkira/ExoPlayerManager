@@ -50,14 +50,14 @@ typealias VideoSizeChangedListener = (width: Int, height: Int, unappliedRotation
 typealias AudioCapabilitiesChangedListener = (AudioCapabilities) -> Unit
 
 /**
- * See [com.google.android.exoplayer2.source.AdaptiveMediaSourceEventListener.onLoadError]
+ * See [com.google.android.exoplayer2.source.MediaSourceEventListener.onLoadError]
  */
-typealias AdaptiveMediaSourceLoadErrorListener = (dataSpec: DataSpec?, dataType: Int, trackType: Int,
-                                                  trackFormat: Format?, trackSelectionReason: Int,
-                                                  trackSelectionData: Any?, mediaStartTimeMs: Long,
-                                                  mediaEndTimeMs: Long, elapsedRealtimeMs: Long,
-                                                  loadDurationMs: Long, bytesLoaded: Long,
-                                                  error: IOException?, wasCanceled: Boolean) -> Unit
+typealias MediaSourceLoadErrorListener = (dataSpec: DataSpec?, dataType: Int, trackType: Int,
+                                          trackFormat: Format?, trackSelectionReason: Int,
+                                          trackSelectionData: Any?, mediaStartTimeMs: Long,
+                                          mediaEndTimeMs: Long, elapsedRealtimeMs: Long,
+                                          loadDurationMs: Long, bytesLoaded: Long,
+                                          error: IOException?, wasCanceled: Boolean) -> Unit
 
 /**
  * See [com.google.android.exoplayer2.source.ExtractorMediaSource.EventListener]

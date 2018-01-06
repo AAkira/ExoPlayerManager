@@ -36,7 +36,7 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
     private var playerNeedsPrepare = false
     private var trackSelector: DefaultTrackSelector? = null
 
-    private val onAdaptiveMediaSourceLoadErrorListeners = ArrayList<AdaptiveMediaSourceLoadErrorListener>()
+    private val onMediaSourceLoadErrorListeners = ArrayList<MediaSourceLoadErrorListener>()
     private var onAudioCapabilitiesChangedListeners = ArrayList<AudioCapabilitiesChangedListener>()
     private val onExtractorMediaSourceLoadErrorListeners = ArrayList<ExtractorMediaSourceLoadErrorListener>()
     private val onMetadataListeners = ArrayList<MetadataListener>()
@@ -49,12 +49,12 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
     private val onVideoRenderedListeners = ArrayList<VideoRenderedListener>()
 
     init {
-        eventProxy.onAdaptiveMediaSourceLoadErrorListener = { dataSpec: DataSpec?, dataType: Int, trackType: Int, trackFormat: Format?,
-                                                              trackSelectionReason: Int, trackSelectionData: Any?,
-                                                              mediaStartTimeMs: Long, mediaEndTimeMs: Long, elapsedRealtimeMs: Long,
-                                                              loadDurationMs: Long, bytesLoaded: Long, error: IOException?, wasCanceled: Boolean ->
+        eventProxy.onMediaSourceLoadErrorListener = { dataSpec: DataSpec?, dataType: Int, trackType: Int, trackFormat: Format?,
+                                                      trackSelectionReason: Int, trackSelectionData: Any?,
+                                                      mediaStartTimeMs: Long, mediaEndTimeMs: Long, elapsedRealtimeMs: Long,
+                                                      loadDurationMs: Long, bytesLoaded: Long, error: IOException?, wasCanceled: Boolean ->
 
-            onAdaptiveMediaSourceLoadErrorListeners.forEach {
+            onMediaSourceLoadErrorListeners.forEach {
                 it.invoke(dataSpec, dataType, trackType, trackFormat, trackSelectionReason,
                         trackSelectionData, mediaStartTimeMs, mediaEndTimeMs, elapsedRealtimeMs,
                         loadDurationMs, bytesLoaded, error, wasCanceled)
@@ -241,16 +241,16 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
         bandwidthMeter.setLimitBitrate(maxVideoBitrate)
     }
 
-    fun addOnAdaptiveMediaSourceLoadErrorListener(listener: AdaptiveMediaSourceLoadErrorListener) {
-        onAdaptiveMediaSourceLoadErrorListeners.add(listener)
+    fun addOnMediaSourceLoadErrorListener(listener: MediaSourceLoadErrorListener) {
+        onMediaSourceLoadErrorListeners.add(listener)
     }
 
-    fun removeAdaptiveMediaSourceErrorListener(listener: AdaptiveMediaSourceLoadErrorListener) {
-        onAdaptiveMediaSourceLoadErrorListeners.remove(listener)
+    fun removeMediaSourceErrorListener(listener: MediaSourceLoadErrorListener) {
+        onMediaSourceLoadErrorListeners.remove(listener)
     }
 
-    fun clearAdaptiveMediaSourceErrorListeners() {
-        onAdaptiveMediaSourceLoadErrorListeners.clear()
+    fun clearMediaSourceErrorListeners() {
+        onMediaSourceLoadErrorListeners.clear()
     }
 
     fun addOnAudioCapabilitiesChangedListener(listener: AudioCapabilitiesChangedListener) {

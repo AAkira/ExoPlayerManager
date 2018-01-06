@@ -69,7 +69,7 @@ class PlayerActivity : Activity() {
         playerManager.addOnVideoSizeChangedListener { width, height, unappliedRotationDegrees, pixelWidthHeightRatio ->
 
         }
-        playerManager.addOnAdaptiveMediaSourceLoadErrorListener {
+        playerManager.addOnMediaSourceLoadErrorListener {
             dataSpec: DataSpec?, dataType: Int, trackType: Int,
             trackFormat: Format?, trackSelectionReason: Int, trackSelectionData: Any?,
             mediaStartTimeMs: Long, mediaEndTimeMs: Long, elapsedRealtimeMs: Long,
