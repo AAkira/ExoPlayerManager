@@ -28,7 +28,7 @@ This is written in Kotlin.
 ## Requirements
 
 * Kotlin 1.1.0 or above
-* ExoPlayer r2.0 or above
+* ExoPlayer 2.6 or above
 * Android SDK version 4.1 or above (ExoPlayer requirements)
 
 ## Usage
@@ -146,8 +146,8 @@ buildscript {
 }
 
 dependencies {
-	compile 'com.github.aakira:exoplayer-manager:0.0.7@aar'
-	compile 'com.github.aakira:exoplayer-manager-ima:0.0.7@aar' // if you use an IMA SDK
+	implementation 'com.github.aakira:exoplayer-manager:0.0.8@aar'
+	implementation 'com.github.aakira:exoplayer-manager-ima:0.0.8@aar' // if you use an IMA SDK
 }
 ```
 ## Using libraries

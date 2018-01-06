@@ -11,18 +11,20 @@ import com.google.android.exoplayer2.audio.AudioCapabilities
 import com.google.android.exoplayer2.audio.AudioCapabilitiesReceiver
 import com.google.android.exoplayer2.decoder.DecoderCounters
 import com.google.android.exoplayer2.metadata.Metadata
-import com.google.android.exoplayer2.metadata.MetadataRenderer
-import com.google.android.exoplayer2.source.AdaptiveMediaSourceEventListener
-import com.google.android.exoplayer2.source.ExtractorMediaSource
+import com.google.android.exoplayer2.metadata.MetadataOutput
+import com.google.android.exoplayer2.source.MediaSourceEventListener
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.upstream.DataSpec
 import com.google.android.exoplayer2.video.VideoRendererEventListener
 import java.io.IOException
 
-class EventProxy : Player.EventListener, MetadataRenderer.Output, SimpleExoPlayer.VideoListener,
-        AudioCapabilitiesReceiver.Listener, AdaptiveMediaSourceEventListener,
-        ExtractorMediaSource.EventListener, VideoRendererEventListener {
+class EventProxy : Player.EventListener,
+        MetadataOutput,
+        SimpleExoPlayer.VideoListener,
+        AudioCapabilitiesReceiver.Listener,
+        VideoRendererEventListener,
+        MediaSourceEventListener {
 
     var onTracksChangedListener: TracksChangedListener? = null
     var onPlayerStateChangedListener: PlayerStateChangedListener? = null
@@ -32,8 +34,7 @@ class EventProxy : Player.EventListener, MetadataRenderer.Output, SimpleExoPlaye
     var onMetadataListener: MetadataListener? = null
     var onVideoSizeChangedListener: VideoSizeChangedListener? = null
     var onAudioCapabilitiesChangedListener: AudioCapabilitiesChangedListener? = null
-    var onAdaptiveMediaSourceLoadErrorListener: AdaptiveMediaSourceLoadErrorListener? = null
-    var onExtractorMediaSourceLoadErrorListener: ExtractorMediaSourceLoadErrorListener? = null
+    var onMediaSourceLoadErrorListener: MediaSourceLoadErrorListener? = null
     var onVideoRenderedListener: VideoRenderedListener? = null
 
     // Player.EventListener
@@ -57,12 +58,22 @@ class EventProxy : Player.EventListener, MetadataRenderer.Output, SimpleExoPlaye
     }
 
     // Player.EventListener
+    override fun onRepeatModeChanged(repeatMode: Int) {
+        onRepeatModeChangedListener?.invoke(repeatMode)
+    }
+
+    // Player.EventListener
+    override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
+        // Do nothing.
+    }
+
+    // Player.EventListener
     override fun onPlayerError(error: ExoPlaybackException) {
         onPlayerErrorListener?.invoke(error)
     }
 
     // Player.EventListener
-    override fun onPositionDiscontinuity() {
+    override fun onPositionDiscontinuity(reason: Int) {
         // Do nothing.
     }
 
@@ -72,8 +83,8 @@ class EventProxy : Player.EventListener, MetadataRenderer.Output, SimpleExoPlaye
     }
 
     // Player.EventListener
-    override fun onRepeatModeChanged(repeatMode: Int) {
-        onRepeatModeChangedListener?.invoke(repeatMode)
+    override fun onSeekProcessed() {
+        // Do nothing.
     }
 
     // MetadataRenderer.Output
@@ -97,52 +108,47 @@ class EventProxy : Player.EventListener, MetadataRenderer.Output, SimpleExoPlaye
         onAudioCapabilitiesChangedListener?.invoke(audioCapabilities)
     }
 
-    // AdaptiveMediaSourceEventListener
+    // MediaSourceEventListener
     override fun onLoadStarted(dataSpec: DataSpec?, dataType: Int, trackType: Int, trackFormat: Format?,
                                trackSelectionReason: Int, trackSelectionData: Any?, mediaStartTimeMs: Long,
                                mediaEndTimeMs: Long, elapsedRealtimeMs: Long) {
         // Do nothing.
     }
 
-    // AdaptiveMediaSourceEventListener
+    // MediaSourceEventListener
     override fun onDownstreamFormatChanged(trackType: Int, trackFormat: Format?, trackSelectionReason: Int,
                                            trackSelectionData: Any?, mediaTimeMs: Long) {
         // Do nothing.
     }
 
-    // AdaptiveMediaSourceEventListener
+    // MediaSourceEventListener
     override fun onUpstreamDiscarded(trackType: Int, mediaStartTimeMs: Long, mediaEndTimeMs: Long) {
         // Do nothing.
     }
 
-    // AdaptiveMediaSourceEventListener
+    // MediaSourceEventListener
     override fun onLoadCanceled(dataSpec: DataSpec?, dataType: Int, trackType: Int, trackFormat: Format?,
                                 trackSelectionReason: Int, trackSelectionData: Any?, mediaStartTimeMs: Long,
                                 mediaEndTimeMs: Long, elapsedRealtimeMs: Long, loadDurationMs: Long, bytesLoaded: Long) {
         // Do nothing.
     }
 
-    // AdaptiveMediaSourceEventListener
+    // MediaSourceEventListener
     override fun onLoadCompleted(dataSpec: DataSpec?, dataType: Int, trackType: Int, trackFormat: Format?,
                                  trackSelectionReason: Int, trackSelectionData: Any?, mediaStartTimeMs: Long,
                                  mediaEndTimeMs: Long, elapsedRealtimeMs: Long, loadDurationMs: Long, bytesLoaded: Long) {
         // Do nothing.
     }
 
-    // AdaptiveMediaSourceEventListener
+    // MediaSourceEventListener
     override fun onLoadError(dataSpec: DataSpec?, dataType: Int, trackType: Int, trackFormat: Format?,
                              trackSelectionReason: Int, trackSelectionData: Any?, mediaStartTimeMs: Long,
                              mediaEndTimeMs: Long, elapsedRealtimeMs: Long, loadDurationMs: Long,
                              bytesLoaded: Long, error: IOException?, wasCanceled: Boolean) {
-        onAdaptiveMediaSourceLoadErrorListener?.invoke(dataSpec, dataType, trackType, trackFormat,
+        onMediaSourceLoadErrorListener?.invoke(dataSpec, dataType, trackType, trackFormat,
                 trackSelectionReason, trackSelectionData, mediaStartTimeMs,
                 mediaEndTimeMs, elapsedRealtimeMs, loadDurationMs,
                 bytesLoaded, error, wasCanceled)
-    }
-
-    // ExtractorMediaSource.EventListener
-    override fun onLoadError(error: IOException) {
-        onExtractorMediaSourceLoadErrorListener?.invoke(error)
     }
 
     // VideoRendererEventListener
