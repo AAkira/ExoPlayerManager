@@ -3,13 +3,10 @@ package com.github.aakira.playermanager
 import android.content.Context
 import android.os.Handler
 import com.google.android.exoplayer2.BuildConfig
-import com.google.android.exoplayer2.DefaultLoadControl
-import com.google.android.exoplayer2.DefaultRenderersFactory
-import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.PlaybackParameters
-import com.google.android.exoplayer2.RenderersFactory
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
@@ -39,9 +36,8 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
     private var playerNeedsPrepare = false
     private var trackSelector: DefaultTrackSelector? = null
 
-    private val onAdaptiveMediaSourceLoadErrorListeners = ArrayList<AdaptiveMediaSourceLoadErrorListener>()
+    private val onMediaSourceLoadErrorListeners = ArrayList<MediaSourceLoadErrorListener>()
     private var onAudioCapabilitiesChangedListeners = ArrayList<AudioCapabilitiesChangedListener>()
-    private val onExtractorMediaSourceLoadErrorListeners = ArrayList<ExtractorMediaSourceLoadErrorListener>()
     private val onMetadataListeners = ArrayList<MetadataListener>()
     private val onPlaybackParametersListeners = ArrayList<PlaybackParametersChangedListener>()
     private val onPlayerErrorListeners = ArrayList<PlayerErrorListener>()
@@ -52,12 +48,12 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
     private val onVideoRenderedListeners = ArrayList<VideoRenderedListener>()
 
     init {
-        eventProxy.onAdaptiveMediaSourceLoadErrorListener = { dataSpec: DataSpec?, dataType: Int, trackType: Int, trackFormat: Format?,
-                                                              trackSelectionReason: Int, trackSelectionData: Any?,
-                                                              mediaStartTimeMs: Long, mediaEndTimeMs: Long, elapsedRealtimeMs: Long,
-                                                              loadDurationMs: Long, bytesLoaded: Long, error: IOException?, wasCanceled: Boolean ->
+        eventProxy.onMediaSourceLoadErrorListener = { dataSpec: DataSpec?, dataType: Int, trackType: Int, trackFormat: Format?,
+                                                      trackSelectionReason: Int, trackSelectionData: Any?,
+                                                      mediaStartTimeMs: Long, mediaEndTimeMs: Long, elapsedRealtimeMs: Long,
+                                                      loadDurationMs: Long, bytesLoaded: Long, error: IOException?, wasCanceled: Boolean ->
 
-            onAdaptiveMediaSourceLoadErrorListeners.forEach {
+            onMediaSourceLoadErrorListeners.forEach {
                 it.invoke(dataSpec, dataType, trackType, trackFormat, trackSelectionReason,
                         trackSelectionData, mediaStartTimeMs, mediaEndTimeMs, elapsedRealtimeMs,
                         loadDurationMs, bytesLoaded, error, wasCanceled)
@@ -65,11 +61,6 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
         }
         eventProxy.onAudioCapabilitiesChangedListener = {
             onAudioCapabilitiesChangedListeners.forEach { listener ->
-                listener.invoke(it)
-            }
-        }
-        eventProxy.onExtractorMediaSourceLoadErrorListener = {
-            onExtractorMediaSourceLoadErrorListeners.forEach { listener ->
                 listener.invoke(it)
             }
         }
@@ -102,19 +93,18 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
         }
 
         trackSelector = DefaultTrackSelector(AdaptiveTrackSelection.Factory(bandwidthMeter))
-        val renderersFactory: RenderersFactory = DefaultRenderersFactory(context)
-        player = ExoPlayerFactory.newSimpleInstance(renderersFactory, trackSelector, DefaultLoadControl()).apply {
+        player = ExoPlayerFactory.newSimpleInstance(context, trackSelector).apply {
             addListener(eventProxy)
-            setVideoListener(eventProxy)
-            setMetadataOutput(eventProxy)
-            setVideoDebugListener(eventProxy)
+            addVideoListener(eventProxy)
+            addMetadataOutput(eventProxy)
+            addVideoDebugListener(eventProxy)
 
             if (debugLogger) {
                 EventLogger(trackSelector).let {
                     addListener(it)
-                    setAudioDebugListener(it)
-                    setVideoDebugListener(it)
-                    setMetadataOutput(it)
+                    addAudioDebugListener(it)
+                    addVideoDebugListener(it)
+                    addMetadataOutput(it)
                 }
             }
         }
@@ -130,14 +120,19 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
 
         trackSelector?.parameters = DefaultTrackSelector.Parameters(
                 dataSourceCreator.preferredAudioLanguage, dataSourceCreator.preferredTextLanguage,
+                dataSourceCreator.selectUndeterminedTextLanguage, dataSourceCreator.forceLowestBitrate,
                 dataSourceCreator.allowMixedMimeAdaptiveness, dataSourceCreator.allowNonSeamlessAdaptiveness,
                 dataSourceCreator.maxVideoWidth, dataSourceCreator.maxVideoHeight, dataSourceCreator.maxVideoBitrate,
                 dataSourceCreator.exceedVideoConstraintsIfNecessary, dataSourceCreator.exceedRendererCapabilitiesIfNecessary,
                 dataSourceCreator.viewportWidth, dataSourceCreator.viewportHeight, dataSourceCreator.orientationMayChange)
 
-        mediaSource = HlsMediaSource(dataSourceCreator.uri, dataSourceCreator.dataSourceCreatorInterface?.let {
-            dataSourceCreator.dataSourceCreatorInterface.create(context, bandwidthMeter, dataSource)
-        } ?: dataSource, mainHandler, eventProxy)
+        mediaSource = HlsMediaSource.Factory(
+                dataSourceCreator.dataSourceCreatorInterface?.let {
+                    dataSourceCreator.dataSourceCreatorInterface.create(context, bandwidthMeter, dataSource)
+                } ?: dataSource
+        )
+                .createMediaSource(dataSourceCreator.uri, mainHandler, eventProxy)
+
         playerNeedsPrepare = true
     }
 
@@ -146,20 +141,26 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
 
         trackSelector?.parameters = DefaultTrackSelector.Parameters(
                 dataSourceCreator.preferredAudioLanguage, dataSourceCreator.preferredTextLanguage,
+                dataSourceCreator.selectUndeterminedTextLanguage, dataSourceCreator.forceLowestBitrate,
                 dataSourceCreator.allowMixedMimeAdaptiveness, dataSourceCreator.allowNonSeamlessAdaptiveness,
                 dataSourceCreator.maxVideoWidth, dataSourceCreator.maxVideoHeight, dataSourceCreator.maxVideoBitrate,
                 dataSourceCreator.exceedVideoConstraintsIfNecessary, dataSourceCreator.exceedRendererCapabilitiesIfNecessary,
                 dataSourceCreator.viewportWidth, dataSourceCreator.viewportHeight, dataSourceCreator.orientationMayChange)
 
-        mediaSource = ExtractorMediaSource(dataSourceCreator.uri, dataSourceCreator.dataSourceCreatorInterface?.let {
-            dataSourceCreator.dataSourceCreatorInterface.create(context, bandwidthMeter, dataSource)
-        } ?: dataSource, DefaultExtractorsFactory(), mainHandler, eventProxy)
+        mediaSource = ExtractorMediaSource.Factory(
+                dataSourceCreator.dataSourceCreatorInterface?.let {
+                    dataSourceCreator.dataSourceCreatorInterface.create(context, bandwidthMeter, dataSource)
+                } ?: dataSource
+        )
+                .setExtractorsFactory(DefaultExtractorsFactory())
+                .createMediaSource(dataSourceCreator.uri, mainHandler, eventProxy)
+
         playerNeedsPrepare = true
     }
 
     fun release() {
         player?.release()
-        player?.removeListener(eventProxy)
+        clearExoPlayerListeners()
         player = null
     }
 
@@ -204,7 +205,7 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
 
     fun isPlaying() = player?.playWhenReady ?: false
 
-    fun getPlaybackState() = player?.playbackState ?: ExoPlayer.STATE_IDLE
+    fun getPlaybackState() = player?.playbackState ?: Player.STATE_IDLE
 
     fun getVolume() = player?.volume ?: 0f
 
@@ -234,16 +235,16 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
         bandwidthMeter.setLimitBitrate(maxVideoBitrate)
     }
 
-    fun addOnAdaptiveMediaSourceLoadErrorListener(listener: AdaptiveMediaSourceLoadErrorListener) {
-        onAdaptiveMediaSourceLoadErrorListeners.add(listener)
+    fun addOnMediaSourceLoadErrorListener(listener: MediaSourceLoadErrorListener) {
+        onMediaSourceLoadErrorListeners.add(listener)
     }
 
-    fun removeAdaptiveMediaSourceErrorListener(listener: AdaptiveMediaSourceLoadErrorListener) {
-        onAdaptiveMediaSourceLoadErrorListeners.remove(listener)
+    fun removeMediaSourceErrorListener(listener: MediaSourceLoadErrorListener) {
+        onMediaSourceLoadErrorListeners.remove(listener)
     }
 
-    fun clearAdaptiveMediaSourceErrorListeners() {
-        onAdaptiveMediaSourceLoadErrorListeners.clear()
+    fun clearMediaSourceErrorListeners() {
+        onMediaSourceLoadErrorListeners.clear()
     }
 
     fun addOnAudioCapabilitiesChangedListener(listener: AudioCapabilitiesChangedListener) {
@@ -342,16 +343,25 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
         onVideoSizeChangedListeners.clear()
     }
 
+    /**
+     * @see [addOnMediaSourceLoadErrorListener]
+     */
+    @Deprecated("Merge MediaSourceLoadErrorListener")
     fun addOnExtractorMediaSourceLoadErrorListener(listener: ExtractorMediaSourceLoadErrorListener) {
-        onExtractorMediaSourceLoadErrorListeners.add(listener)
     }
 
+    /**
+     * @see [removeMediaSourceErrorListener]
+     */
+    @Deprecated("Merge MediaSourceLoadErrorListener")
     fun removeExtractorMediaSourceLoadErrorListener(listener: ExtractorMediaSourceLoadErrorListener) {
-        onExtractorMediaSourceLoadErrorListeners.remove(listener)
     }
 
+    /**
+     * @see [clearMediaSourceErrorListeners]
+     */
+    @Deprecated("Merge MediaSourceLoadErrorListener")
     fun clearExtractorMediaSourceLoadErrorListeners() {
-        onExtractorMediaSourceLoadErrorListeners.clear()
     }
 
     fun addOnVideoRenderedListener(listener: VideoRenderedListener) {
@@ -364,6 +374,26 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
 
     fun clearVideoRenderedListeners() {
         onVideoRenderedListeners.clear()
+    }
+
+    private fun clearExoPlayerListeners() {
+        player?.run {
+            removeListener(eventProxy)
+            removeVideoListener(eventProxy)
+            removeMetadataOutput(eventProxy)
+            removeVideoDebugListener(eventProxy)
+        }
+
+        if (debugLogger) {
+            player?.run {
+                EventLogger(trackSelector).let {
+                    removeListener(it)
+                    removeAudioDebugListener(it)
+                    removeVideoDebugListener(it)
+                    removeMetadataOutput(it)
+                }
+            }
+        }
     }
 
     private fun buildDataSourceFactory(userAgent: String,

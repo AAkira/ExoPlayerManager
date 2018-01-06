@@ -3,7 +3,6 @@ package com.github.aakira.playermanager.sample
 import android.app.Activity
 import android.os.Bundle
 import android.widget.FrameLayout
-import butterknife.bindView
 import com.github.aakira.playermanager.ExoPlayerManager
 import com.github.aakira.playermanager.ima.AdPlayerController
 import com.google.ads.interactivemedia.v3.api.AdErrorEvent
@@ -11,6 +10,7 @@ import com.google.ads.interactivemedia.v3.api.AdEvent
 import com.google.ads.interactivemedia.v3.api.UiElement
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView
 import com.google.android.exoplayer2.util.Util
+import kotterknife.bindView
 
 /**
  * An activity that plays ad video using ima sdk v3.

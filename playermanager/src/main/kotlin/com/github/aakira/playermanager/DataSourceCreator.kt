@@ -25,7 +25,9 @@ class DataSourceCreator private constructor(
         val viewportHeight: Int,
         val orientationMayChange: Boolean,
         val okHttpClient: OkHttpClient? = null,
-        val dataSourceCreatorInterface: DataSourceCreatorInterface?
+        val dataSourceCreatorInterface: DataSourceCreatorInterface?,
+        val selectUndeterminedTextLanguage: Boolean,
+        val forceLowestBitrate: Boolean
 ) {
     /**
      * @param url The video path (stream : url, file: path)
@@ -49,6 +51,11 @@ class DataSourceCreator private constructor(
      * @param orientationMayChange Whether orientation may change during playback.
      * @param okHttpClient Set your OkHttp client if you want use it.
      * @param dataSourceCreatorInterface Set your data source if you want use it.
+     * @param selectUndeterminedTextLanguage Whether a text track with undetermined language should
+     *     be selected if no track with {@link #preferredTextLanguage} is available, or if
+     *     {@link #preferredTextLanguage} is unset.
+     * @param forceLowestBitrate Whether to force selection of the single lowest bitrate audio and
+     *     video tracks that comply with all other constraints.
      */
     data class UrlBuilder(
             val url: String,
@@ -66,13 +73,16 @@ class DataSourceCreator private constructor(
             val viewportHeight: Int = Integer.MAX_VALUE,
             val orientationMayChange: Boolean = true,
             val okHttpClient: OkHttpClient? = null,
-            val dataSourceCreatorInterface: DataSourceCreatorInterface? = null
+            val dataSourceCreatorInterface: DataSourceCreatorInterface? = null,
+            val selectUndeterminedTextLanguage: Boolean = false,
+            val forceLowestBitrate: Boolean = false
     ) {
-        fun build(): DataSourceCreator = DataSourceCreator(Uri.parse(url), userAgent, preferredAudioLanguage,
+        fun build(): DataSourceCreator = UriBuilder(Uri.parse(url), userAgent, preferredAudioLanguage,
                 preferredTextLanguage, allowMixedMimeAdaptiveness, allowNonSeamlessAdaptiveness,
                 maxVideoWidth, maxVideoHeight, maxVideoBitrate, exceedVideoConstraintsIfNecessary,
                 exceedRendererCapabilitiesIfNecessary, viewportWidth, viewportHeight, orientationMayChange,
-                okHttpClient, dataSourceCreatorInterface)
+                okHttpClient, dataSourceCreatorInterface, selectUndeterminedTextLanguage, forceLowestBitrate)
+                .build()
     }
 
     /**
@@ -97,6 +107,11 @@ class DataSourceCreator private constructor(
      * @param orientationMayChange Whether orientation may change during playback.
      * @param okHttpClient Set your OkHttp client if you want use it.
      * @param dataSourceCreatorInterface Set your data source if you want use it.
+     * @param selectUndeterminedTextLanguage Whether a text track with undetermined language should
+     *     be selected if no track with {@link #preferredTextLanguage} is available, or if
+     *     {@link #preferredTextLanguage} is unset.
+     * @param forceLowestBitrate Whether to force selection of the single lowest bitrate audio and
+     *     video tracks that comply with all other constraints.
      */
     data class UriBuilder(
             val uri: Uri,
@@ -114,12 +129,14 @@ class DataSourceCreator private constructor(
             val viewportHeight: Int = Integer.MAX_VALUE,
             val orientationMayChange: Boolean = true,
             val okHttpClient: OkHttpClient? = null,
-            val dataSourceCreatorInterface: DataSourceCreatorInterface? = null
+            val dataSourceCreatorInterface: DataSourceCreatorInterface? = null,
+            val selectUndeterminedTextLanguage: Boolean = false,
+            val forceLowestBitrate: Boolean = false
     ) {
         fun build(): DataSourceCreator = DataSourceCreator(uri, userAgent, preferredAudioLanguage,
                 preferredTextLanguage, allowMixedMimeAdaptiveness, allowNonSeamlessAdaptiveness,
                 maxVideoWidth, maxVideoHeight, maxVideoBitrate, exceedVideoConstraintsIfNecessary,
                 exceedRendererCapabilitiesIfNecessary, viewportWidth, viewportHeight, orientationMayChange,
-                okHttpClient, dataSourceCreatorInterface)
+                okHttpClient, dataSourceCreatorInterface, selectUndeterminedTextLanguage, forceLowestBitrate)
     }
 }

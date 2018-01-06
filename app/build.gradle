@@ -16,6 +16,9 @@ android {
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
+    lintOptions {
+        abortOnError false
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -29,19 +32,27 @@ android {
 }
 
 dependencies {
-    compile project(':playermanager')
-    compile project(':ima')
+    implementation project(':playermanager')
+    implementation project(':ima')
 
-    compile "com.android.support:appcompat-v7:$APP_COMPAT_VERSION"
+    implementation "com.android.support:appcompat-v7:$APP_COMPAT_VERSION"
+
+    // exo palyer
+    implementation "com.google.android.exoplayer:exoplayer:$EXO_PLAYER_VERSION"
+    implementation "com.google.android.exoplayer:extension-okhttp:$EXO_PLAYER_VERSION"
+
+    // ad
+    implementation "com.google.ads.interactivemedia.v3:interactivemedia:$IMA_VERSION"
+    implementation "com.google.android.gms:play-services-ads:$PLAY_SERVICE_VERSION"
 
     // kotlin
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
 
     // di
-    compile "com.jakewharton:kotterknife:$KOTTER_KNIFE_VERSION"
+    implementation "com.jakewharton:kotterknife:$KOTTER_KNIFE_VERSION"
 
     // debug
-    compile "com.jakewharton.timber:timber:$TIMBER_VERSION"
+    implementation "com.jakewharton.timber:timber:$TIMBER_VERSION"
 }
 
 repositories {

@@ -1,15 +1,15 @@
 package com.github.aakira.playermanager.sample
 
-import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.decoder.DecoderCounters
 
 fun SimpleExoPlayer.playerStateString() = "playWhenReady:$playWhenReady playbackState:" +
         when (playbackState) {
-            ExoPlayer.STATE_BUFFERING -> "buffering"
-            ExoPlayer.STATE_ENDED -> "ended"
-            ExoPlayer.STATE_IDLE -> "idle"
-            ExoPlayer.STATE_READY -> "ready"
+            Player.STATE_BUFFERING -> "buffering"
+            Player.STATE_ENDED -> "ended"
+            Player.STATE_IDLE -> "idle"
+            Player.STATE_READY -> "ready"
             else -> "unknown"
         }
 
@@ -32,6 +32,6 @@ private fun getDecoderCountersBufferCountString(counters: DecoderCounters): Stri
     counters.ensureUpdated()
     return " rb:" + counters.renderedOutputBufferCount +
             " sb:" + counters.skippedOutputBufferCount +
-            " db:" + counters.droppedOutputBufferCount +
-            " mcdb:" + counters.maxConsecutiveDroppedOutputBufferCount
+            " db:" + counters.droppedBufferCount +
+            " mcdb:" + counters.maxConsecutiveDroppedBufferCount
 }

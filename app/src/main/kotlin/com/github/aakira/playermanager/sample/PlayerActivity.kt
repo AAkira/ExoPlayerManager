@@ -3,7 +3,6 @@ package com.github.aakira.playermanager.sample
 import android.app.Activity
 import android.os.Bundle
 import android.widget.Button
-import butterknife.bindView
 import com.github.aakira.playermanager.DataSourceCreator
 import com.github.aakira.playermanager.ExoPlayerManager
 import com.google.android.exoplayer2.Format
@@ -11,6 +10,7 @@ import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView
 import com.google.android.exoplayer2.upstream.DataSpec
 import com.google.android.exoplayer2.util.Util
+import kotterknife.bindView
 import timber.log.Timber
 import java.io.IOException
 
@@ -69,7 +69,7 @@ class PlayerActivity : Activity() {
         playerManager.addOnVideoSizeChangedListener { width, height, unappliedRotationDegrees, pixelWidthHeightRatio ->
 
         }
-        playerManager.addOnAdaptiveMediaSourceLoadErrorListener {
+        playerManager.addOnMediaSourceLoadErrorListener {
             dataSpec: DataSpec?, dataType: Int, trackType: Int,
             trackFormat: Format?, trackSelectionReason: Int, trackSelectionData: Any?,
             mediaStartTimeMs: Long, mediaEndTimeMs: Long, elapsedRealtimeMs: Long,
