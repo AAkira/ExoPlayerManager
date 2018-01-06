@@ -38,7 +38,6 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
 
     private val onMediaSourceLoadErrorListeners = ArrayList<MediaSourceLoadErrorListener>()
     private var onAudioCapabilitiesChangedListeners = ArrayList<AudioCapabilitiesChangedListener>()
-    private val onExtractorMediaSourceLoadErrorListeners = ArrayList<ExtractorMediaSourceLoadErrorListener>()
     private val onMetadataListeners = ArrayList<MetadataListener>()
     private val onPlaybackParametersListeners = ArrayList<PlaybackParametersChangedListener>()
     private val onPlayerErrorListeners = ArrayList<PlayerErrorListener>()
@@ -62,11 +61,6 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
         }
         eventProxy.onAudioCapabilitiesChangedListener = {
             onAudioCapabilitiesChangedListeners.forEach { listener ->
-                listener.invoke(it)
-            }
-        }
-        eventProxy.onExtractorMediaSourceLoadErrorListener = {
-            onExtractorMediaSourceLoadErrorListeners.forEach { listener ->
                 listener.invoke(it)
             }
         }
@@ -349,16 +343,25 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
         onVideoSizeChangedListeners.clear()
     }
 
+    /**
+     * @see [addOnMediaSourceLoadErrorListener]
+     */
+    @Deprecated("Merge MediaSourceLoadErrorListener")
     fun addOnExtractorMediaSourceLoadErrorListener(listener: ExtractorMediaSourceLoadErrorListener) {
-        onExtractorMediaSourceLoadErrorListeners.add(listener)
     }
 
+    /**
+     * @see [removeMediaSourceErrorListener]
+     */
+    @Deprecated("Merge MediaSourceLoadErrorListener")
     fun removeExtractorMediaSourceLoadErrorListener(listener: ExtractorMediaSourceLoadErrorListener) {
-        onExtractorMediaSourceLoadErrorListeners.remove(listener)
     }
 
+    /**
+     * @see [clearMediaSourceErrorListeners]
+     */
+    @Deprecated("Merge MediaSourceLoadErrorListener")
     fun clearExtractorMediaSourceLoadErrorListeners() {
-        onExtractorMediaSourceLoadErrorListeners.clear()
     }
 
     fun addOnVideoRenderedListener(listener: VideoRenderedListener) {

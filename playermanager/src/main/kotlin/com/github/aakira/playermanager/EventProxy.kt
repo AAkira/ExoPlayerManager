@@ -12,7 +12,6 @@ import com.google.android.exoplayer2.audio.AudioCapabilitiesReceiver
 import com.google.android.exoplayer2.decoder.DecoderCounters
 import com.google.android.exoplayer2.metadata.Metadata
 import com.google.android.exoplayer2.metadata.MetadataOutput
-import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSourceEventListener
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
@@ -25,14 +24,7 @@ class EventProxy : Player.EventListener,
         SimpleExoPlayer.VideoListener,
         AudioCapabilitiesReceiver.Listener,
         VideoRendererEventListener,
-        MediaSourceEventListener,
-        ExtractorMediaSource.EventListener //TODO remove
-//        ,
-//        AdsMediaSource.EventListener,
-//        DefaultDrmSessionManager.EventListener
-{
-    override fun onLoadError(error: IOException?) { //TODO remove
-    }
+        MediaSourceEventListener {
 
     var onTracksChangedListener: TracksChangedListener? = null
     var onPlayerStateChangedListener: PlayerStateChangedListener? = null
@@ -43,7 +35,6 @@ class EventProxy : Player.EventListener,
     var onVideoSizeChangedListener: VideoSizeChangedListener? = null
     var onAudioCapabilitiesChangedListener: AudioCapabilitiesChangedListener? = null
     var onMediaSourceLoadErrorListener: MediaSourceLoadErrorListener? = null
-    var onExtractorMediaSourceLoadErrorListener: ExtractorMediaSourceLoadErrorListener? = null //TODO remove
     var onVideoRenderedListener: VideoRenderedListener? = null
 
     // Player.EventListener
