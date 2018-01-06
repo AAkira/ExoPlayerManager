@@ -24,7 +24,7 @@ afterEvaluate {
 }
 
 dependencies {
-    compile project(':playermanager')
+    implementation project(':playermanager')
 
     // kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
