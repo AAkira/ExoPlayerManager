@@ -15,7 +15,7 @@ import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView
+import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DataSpec
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
@@ -111,8 +111,8 @@ class ExoPlayerManager(private val context: Context, private val debugLogger: Bo
         playerNeedsPrepare = true
     }
 
-    fun injectView(simpleExoPlayerView: SimpleExoPlayerView) {
-        simpleExoPlayerView.player = player
+    fun injectView(playerView: PlayerView) {
+        playerView.player = player
     }
 
     fun setHlsSource(dataSourceCreator: DataSourceCreator) {

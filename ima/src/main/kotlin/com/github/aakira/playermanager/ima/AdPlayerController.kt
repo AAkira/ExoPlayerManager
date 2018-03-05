@@ -17,7 +17,7 @@ import com.google.ads.interactivemedia.v3.api.player.ContentProgressProvider
 import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer
 import com.google.ads.interactivemedia.v3.api.player.VideoProgressUpdate
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView
+import com.google.android.exoplayer2.ui.PlayerView
 
 class AdPlayerController private constructor(
         context: Context, language: String, userAgent: String,
@@ -29,7 +29,7 @@ class AdPlayerController private constructor(
 
     data class Builder(
             val context: Context,
-            val simpleExoPlayerView: SimpleExoPlayerView,
+            val playerView: PlayerView,
             val adUiContainer: ViewGroup,
             val language: String = "en",
             val userAgent: String = "UserAgent",
@@ -40,7 +40,7 @@ class AdPlayerController private constructor(
     ) {
         fun create(): AdPlayerController {
             val playerManager = playerManager ?: ExoPlayerManager(context)
-            playerManager.injectView(simpleExoPlayerView)
+            playerManager.injectView(playerView)
             val sdkFactory: ImaSdkFactory = ImaSdkFactory.getInstance()
             return AdPlayerController(context, language, userAgent,
                     sdkFactory.createAdsRenderingSettings(), playerManager, adUiContainer,
