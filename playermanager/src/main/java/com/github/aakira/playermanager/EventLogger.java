@@ -18,7 +18,6 @@ package com.github.aakira.playermanager;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.Surface;
-
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.Format;
@@ -39,6 +38,7 @@ import com.google.android.exoplayer2.metadata.id3.Id3Frame;
 import com.google.android.exoplayer2.metadata.id3.PrivFrame;
 import com.google.android.exoplayer2.metadata.id3.TextInformationFrame;
 import com.google.android.exoplayer2.metadata.id3.UrlLinkFrame;
+import com.google.android.exoplayer2.metadata.scte35.SpliceCommand;
 import com.google.android.exoplayer2.source.MediaSourceEventListener;
 import com.google.android.exoplayer2.source.TrackGroup;
 import com.google.android.exoplayer2.source.TrackGroupArray;
@@ -49,13 +49,12 @@ import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
-
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-/** Logs player events using {@link Log}. */
-/* package */ final class EventLogger
+/** Logs events from {@link Player} and other core components using {@link Log}. */
+public class EventLogger
         implements Player.EventListener,
         MetadataOutput,
         AudioRendererEventListener,
@@ -121,10 +120,12 @@ import java.util.Locale;
   }
 
   @Override
-  public void onTimelineChanged(Timeline timeline, Object manifest) {
+  public void onTimelineChanged(Timeline timeline, Object manifest,
+                                @Player.TimelineChangeReason int reason) {
     int periodCount = timeline.getPeriodCount();
     int windowCount = timeline.getWindowCount();
-    Log.d(TAG, "sourceInfo [periodCount=" + periodCount + ", windowCount=" + windowCount);
+    Log.d(TAG, "timelineChanged [periodCount=" + periodCount + ", windowCount=" + windowCount
+            + ", reason=" + getTimelineChangeReasonString(reason));
     for (int i = 0; i < Math.min(periodCount, MAX_TIMELINE_ITEM_LINES); i++) {
       timeline.getPeriod(i, period);
       Log.d(TAG, "  " +  "period [" + getTimeString(period.getDurationMs()) + "]");
@@ -382,6 +383,11 @@ import java.util.Locale;
   }
 
   @Override
+  public void onInternalAdLoadError(RuntimeException error) {
+    printInternalError("internalAdLoadError", error);
+  }
+
+  @Override
   public void onAdClicked() {
     // Do nothing.
   }
@@ -429,6 +435,10 @@ import java.util.Locale;
         EventMessage eventMessage = (EventMessage) entry;
         Log.d(TAG, prefix + String.format("EMSG: scheme=%s, id=%d, value=%s",
                 eventMessage.schemeIdUri, eventMessage.id, eventMessage.value));
+      } else if (entry instanceof SpliceCommand) {
+        String description =
+                String.format("SCTE-35 splice command: type=%s.", entry.getClass().getSimpleName());
+        Log.d(TAG, prefix + description);
       }
     }
   }
@@ -523,10 +533,26 @@ import java.util.Locale;
         return "SEEK";
       case Player.DISCONTINUITY_REASON_SEEK_ADJUSTMENT:
         return "SEEK_ADJUSTMENT";
+      case Player.DISCONTINUITY_REASON_AD_INSERTION:
+        return "AD_INSERTION";
       case Player.DISCONTINUITY_REASON_INTERNAL:
         return "INTERNAL";
       default:
         return "?";
     }
   }
+
+  private static String getTimelineChangeReasonString(@Player.TimelineChangeReason int reason) {
+    switch (reason) {
+      case Player.TIMELINE_CHANGE_REASON_PREPARED:
+        return "PREPARED";
+      case Player.TIMELINE_CHANGE_REASON_RESET:
+        return "RESET";
+      case Player.TIMELINE_CHANGE_REASON_DYNAMIC:
+        return "DYNAMIC";
+      default:
+        return "?";
+    }
+  }
+
 }

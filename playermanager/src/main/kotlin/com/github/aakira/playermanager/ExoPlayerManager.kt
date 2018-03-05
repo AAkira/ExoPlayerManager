@@ -118,13 +118,20 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
     fun setHlsSource(dataSourceCreator: DataSourceCreator) {
         val dataSource = buildDataSourceFactory(dataSourceCreator.userAgent, bandwidthMeter, dataSourceCreator.okHttpClient)
 
-        trackSelector?.parameters = DefaultTrackSelector.Parameters(
-                dataSourceCreator.preferredAudioLanguage, dataSourceCreator.preferredTextLanguage,
-                dataSourceCreator.selectUndeterminedTextLanguage, dataSourceCreator.forceLowestBitrate,
-                dataSourceCreator.allowMixedMimeAdaptiveness, dataSourceCreator.allowNonSeamlessAdaptiveness,
-                dataSourceCreator.maxVideoWidth, dataSourceCreator.maxVideoHeight, dataSourceCreator.maxVideoBitrate,
-                dataSourceCreator.exceedVideoConstraintsIfNecessary, dataSourceCreator.exceedRendererCapabilitiesIfNecessary,
-                dataSourceCreator.viewportWidth, dataSourceCreator.viewportHeight, dataSourceCreator.orientationMayChange)
+        trackSelector?.parameters = DefaultTrackSelector.ParametersBuilder()
+                .setPreferredAudioLanguage(dataSourceCreator.preferredAudioLanguage)
+                .setPreferredTextLanguage(dataSourceCreator.preferredTextLanguage)
+                .setSelectUndeterminedTextLanguage(dataSourceCreator.selectUndeterminedTextLanguage)
+                .setDisabledTextTrackSelectionFlags(dataSourceCreator.disabledTextTrackSelectionFlags)
+                .setForceLowestBitrate(dataSourceCreator.forceLowestBitrate)
+                .setAllowMixedMimeAdaptiveness(dataSourceCreator.allowMixedMimeAdaptiveness)
+                .setAllowNonSeamlessAdaptiveness(dataSourceCreator.allowNonSeamlessAdaptiveness)
+                .setMaxVideoSize(dataSourceCreator.maxVideoWidth, dataSourceCreator.maxVideoHeight)
+                .setMaxVideoBitrate(dataSourceCreator.maxVideoBitrate)
+                .setExceedVideoConstraintsIfNecessary(dataSourceCreator.exceedVideoConstraintsIfNecessary)
+                .setExceedRendererCapabilitiesIfNecessary(dataSourceCreator.exceedRendererCapabilitiesIfNecessary)
+                .setViewportSize(dataSourceCreator.viewportWidth, dataSourceCreator.viewportHeight, dataSourceCreator.viewportOrientationMayChange)
+                .build()
 
         mediaSource = HlsMediaSource.Factory(
                 dataSourceCreator.dataSourceCreatorInterface?.let {
@@ -139,13 +146,20 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
     fun setExtractorMediaSource(dataSourceCreator: DataSourceCreator) {
         val dataSource = buildDataSourceFactory(dataSourceCreator.userAgent, bandwidthMeter, dataSourceCreator.okHttpClient)
 
-        trackSelector?.parameters = DefaultTrackSelector.Parameters(
-                dataSourceCreator.preferredAudioLanguage, dataSourceCreator.preferredTextLanguage,
-                dataSourceCreator.selectUndeterminedTextLanguage, dataSourceCreator.forceLowestBitrate,
-                dataSourceCreator.allowMixedMimeAdaptiveness, dataSourceCreator.allowNonSeamlessAdaptiveness,
-                dataSourceCreator.maxVideoWidth, dataSourceCreator.maxVideoHeight, dataSourceCreator.maxVideoBitrate,
-                dataSourceCreator.exceedVideoConstraintsIfNecessary, dataSourceCreator.exceedRendererCapabilitiesIfNecessary,
-                dataSourceCreator.viewportWidth, dataSourceCreator.viewportHeight, dataSourceCreator.orientationMayChange)
+        trackSelector?.parameters = DefaultTrackSelector.ParametersBuilder()
+                .setPreferredAudioLanguage(dataSourceCreator.preferredAudioLanguage)
+                .setPreferredTextLanguage(dataSourceCreator.preferredTextLanguage)
+                .setSelectUndeterminedTextLanguage(dataSourceCreator.selectUndeterminedTextLanguage)
+                .setDisabledTextTrackSelectionFlags(dataSourceCreator.disabledTextTrackSelectionFlags)
+                .setForceLowestBitrate(dataSourceCreator.forceLowestBitrate)
+                .setAllowMixedMimeAdaptiveness(dataSourceCreator.allowMixedMimeAdaptiveness)
+                .setAllowNonSeamlessAdaptiveness(dataSourceCreator.allowNonSeamlessAdaptiveness)
+                .setMaxVideoSize(dataSourceCreator.maxVideoWidth, dataSourceCreator.maxVideoHeight)
+                .setMaxVideoBitrate(dataSourceCreator.maxVideoBitrate)
+                .setExceedVideoConstraintsIfNecessary(dataSourceCreator.exceedVideoConstraintsIfNecessary)
+                .setExceedRendererCapabilitiesIfNecessary(dataSourceCreator.exceedRendererCapabilitiesIfNecessary)
+                .setViewportSize(dataSourceCreator.viewportWidth, dataSourceCreator.viewportHeight, dataSourceCreator.viewportOrientationMayChange)
+                .build()
 
         mediaSource = ExtractorMediaSource.Factory(
                 dataSourceCreator.dataSourceCreatorInterface?.let {

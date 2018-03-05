@@ -38,7 +38,7 @@ class EventProxy : Player.EventListener,
     var onVideoRenderedListener: VideoRenderedListener? = null
 
     // Player.EventListener
-    override fun onTimelineChanged(timeline: Timeline, manifest: Any?) {
+    override fun onTimelineChanged(timeline: Timeline?, manifest: Any?, reason: Int) {
         // Do nothing.
     }
 
