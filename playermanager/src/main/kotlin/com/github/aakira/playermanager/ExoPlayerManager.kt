@@ -24,7 +24,7 @@ import com.google.android.exoplayer2.upstream.TransferListener
 import okhttp3.OkHttpClient
 import java.io.IOException
 
-class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildConfig.DEBUG) {
+class ExoPlayerManager(private val context: Context, private val debugLogger: Boolean = BuildConfig.DEBUG) {
 
     var player: SimpleExoPlayer? = null
         private set

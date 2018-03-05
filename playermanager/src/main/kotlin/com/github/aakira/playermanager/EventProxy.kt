@@ -5,7 +5,6 @@ import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.audio.AudioCapabilities
 import com.google.android.exoplayer2.audio.AudioCapabilitiesReceiver
@@ -16,12 +15,13 @@ import com.google.android.exoplayer2.source.MediaSourceEventListener
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.upstream.DataSpec
+import com.google.android.exoplayer2.video.VideoListener
 import com.google.android.exoplayer2.video.VideoRendererEventListener
 import java.io.IOException
 
 class EventProxy : Player.EventListener,
         MetadataOutput,
-        SimpleExoPlayer.VideoListener,
+        VideoListener,
         AudioCapabilitiesReceiver.Listener,
         VideoRendererEventListener,
         MediaSourceEventListener {
