@@ -15,7 +15,7 @@ import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView
+import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DataSpec
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
@@ -24,7 +24,7 @@ import com.google.android.exoplayer2.upstream.TransferListener
 import okhttp3.OkHttpClient
 import java.io.IOException
 
-class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildConfig.DEBUG) {
+class ExoPlayerManager(private val context: Context, private val debugLogger: Boolean = BuildConfig.DEBUG) {
 
     var player: SimpleExoPlayer? = null
         private set
@@ -111,20 +111,27 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
         playerNeedsPrepare = true
     }
 
-    fun injectView(simpleExoPlayerView: SimpleExoPlayerView) {
-        simpleExoPlayerView.player = player
+    fun injectView(playerView: PlayerView) {
+        playerView.player = player
     }
 
     fun setHlsSource(dataSourceCreator: DataSourceCreator) {
         val dataSource = buildDataSourceFactory(dataSourceCreator.userAgent, bandwidthMeter, dataSourceCreator.okHttpClient)
 
-        trackSelector?.parameters = DefaultTrackSelector.Parameters(
-                dataSourceCreator.preferredAudioLanguage, dataSourceCreator.preferredTextLanguage,
-                dataSourceCreator.selectUndeterminedTextLanguage, dataSourceCreator.forceLowestBitrate,
-                dataSourceCreator.allowMixedMimeAdaptiveness, dataSourceCreator.allowNonSeamlessAdaptiveness,
-                dataSourceCreator.maxVideoWidth, dataSourceCreator.maxVideoHeight, dataSourceCreator.maxVideoBitrate,
-                dataSourceCreator.exceedVideoConstraintsIfNecessary, dataSourceCreator.exceedRendererCapabilitiesIfNecessary,
-                dataSourceCreator.viewportWidth, dataSourceCreator.viewportHeight, dataSourceCreator.orientationMayChange)
+        trackSelector?.parameters = DefaultTrackSelector.ParametersBuilder()
+                .setPreferredAudioLanguage(dataSourceCreator.preferredAudioLanguage)
+                .setPreferredTextLanguage(dataSourceCreator.preferredTextLanguage)
+                .setSelectUndeterminedTextLanguage(dataSourceCreator.selectUndeterminedTextLanguage)
+                .setDisabledTextTrackSelectionFlags(dataSourceCreator.disabledTextTrackSelectionFlags)
+                .setForceLowestBitrate(dataSourceCreator.forceLowestBitrate)
+                .setAllowMixedMimeAdaptiveness(dataSourceCreator.allowMixedMimeAdaptiveness)
+                .setAllowNonSeamlessAdaptiveness(dataSourceCreator.allowNonSeamlessAdaptiveness)
+                .setMaxVideoSize(dataSourceCreator.maxVideoWidth, dataSourceCreator.maxVideoHeight)
+                .setMaxVideoBitrate(dataSourceCreator.maxVideoBitrate)
+                .setExceedVideoConstraintsIfNecessary(dataSourceCreator.exceedVideoConstraintsIfNecessary)
+                .setExceedRendererCapabilitiesIfNecessary(dataSourceCreator.exceedRendererCapabilitiesIfNecessary)
+                .setViewportSize(dataSourceCreator.viewportWidth, dataSourceCreator.viewportHeight, dataSourceCreator.viewportOrientationMayChange)
+                .build()
 
         mediaSource = HlsMediaSource.Factory(
                 dataSourceCreator.dataSourceCreatorInterface?.let {
@@ -139,13 +146,20 @@ class ExoPlayerManager(val context: Context, val debugLogger: Boolean = BuildCon
     fun setExtractorMediaSource(dataSourceCreator: DataSourceCreator) {
         val dataSource = buildDataSourceFactory(dataSourceCreator.userAgent, bandwidthMeter, dataSourceCreator.okHttpClient)
 
-        trackSelector?.parameters = DefaultTrackSelector.Parameters(
-                dataSourceCreator.preferredAudioLanguage, dataSourceCreator.preferredTextLanguage,
-                dataSourceCreator.selectUndeterminedTextLanguage, dataSourceCreator.forceLowestBitrate,
-                dataSourceCreator.allowMixedMimeAdaptiveness, dataSourceCreator.allowNonSeamlessAdaptiveness,
-                dataSourceCreator.maxVideoWidth, dataSourceCreator.maxVideoHeight, dataSourceCreator.maxVideoBitrate,
-                dataSourceCreator.exceedVideoConstraintsIfNecessary, dataSourceCreator.exceedRendererCapabilitiesIfNecessary,
-                dataSourceCreator.viewportWidth, dataSourceCreator.viewportHeight, dataSourceCreator.orientationMayChange)
+        trackSelector?.parameters = DefaultTrackSelector.ParametersBuilder()
+                .setPreferredAudioLanguage(dataSourceCreator.preferredAudioLanguage)
+                .setPreferredTextLanguage(dataSourceCreator.preferredTextLanguage)
+                .setSelectUndeterminedTextLanguage(dataSourceCreator.selectUndeterminedTextLanguage)
+                .setDisabledTextTrackSelectionFlags(dataSourceCreator.disabledTextTrackSelectionFlags)
+                .setForceLowestBitrate(dataSourceCreator.forceLowestBitrate)
+                .setAllowMixedMimeAdaptiveness(dataSourceCreator.allowMixedMimeAdaptiveness)
+                .setAllowNonSeamlessAdaptiveness(dataSourceCreator.allowNonSeamlessAdaptiveness)
+                .setMaxVideoSize(dataSourceCreator.maxVideoWidth, dataSourceCreator.maxVideoHeight)
+                .setMaxVideoBitrate(dataSourceCreator.maxVideoBitrate)
+                .setExceedVideoConstraintsIfNecessary(dataSourceCreator.exceedVideoConstraintsIfNecessary)
+                .setExceedRendererCapabilitiesIfNecessary(dataSourceCreator.exceedRendererCapabilitiesIfNecessary)
+                .setViewportSize(dataSourceCreator.viewportWidth, dataSourceCreator.viewportHeight, dataSourceCreator.viewportOrientationMayChange)
+                .build()
 
         mediaSource = ExtractorMediaSource.Factory(
                 dataSourceCreator.dataSourceCreatorInterface?.let {

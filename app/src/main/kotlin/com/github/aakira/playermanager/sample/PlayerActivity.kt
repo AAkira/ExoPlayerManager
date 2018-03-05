@@ -7,7 +7,7 @@ import com.github.aakira.playermanager.DataSourceCreator
 import com.github.aakira.playermanager.ExoPlayerManager
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView
+import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DataSpec
 import com.google.android.exoplayer2.util.Util
 import kotterknife.bindView
@@ -25,7 +25,7 @@ class PlayerActivity : Activity() {
                 "https://devimages.apple.com.edgekey.net/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8"
     }
 
-    private val simpleExoPlayerView: SimpleExoPlayerView by bindView(R.id.player_view)
+    private val playerView: PlayerView by bindView(R.id.player_view)
     private val limitBitrateButton: Button by bindView(R.id.limitBitrateButton)
     private val playBackSpeedButton: Button by bindView(R.id.playBackSpeedButton)
     private val playButton: Button by bindView(R.id.playButton)
@@ -39,7 +39,7 @@ class PlayerActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.player_activity)
 
-        playerManager.injectView(simpleExoPlayerView)
+        playerManager.injectView(playerView)
         playerManager.getPlayBackParameters()?.let { updatePlayBackSpeedString(it.speed) }
 
         playButton.setOnClickListener {
