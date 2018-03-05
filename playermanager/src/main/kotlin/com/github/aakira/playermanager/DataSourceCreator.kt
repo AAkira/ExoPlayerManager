@@ -23,11 +23,12 @@ class DataSourceCreator private constructor(
         val exceedRendererCapabilitiesIfNecessary: Boolean,
         val viewportWidth: Int,
         val viewportHeight: Int,
-        val orientationMayChange: Boolean,
+        val viewportOrientationMayChange: Boolean,
         val okHttpClient: OkHttpClient? = null,
         val dataSourceCreatorInterface: DataSourceCreatorInterface?,
         val selectUndeterminedTextLanguage: Boolean,
-        val forceLowestBitrate: Boolean
+        val forceLowestBitrate: Boolean,
+        val disabledTextTrackSelectionFlags: Int
 ) {
     /**
      * @param url The video path (stream : url, file: path)
@@ -48,7 +49,7 @@ class DataSourceCreator private constructor(
      *     selection can be made otherwise.
      * @param viewportWidth Viewport width in pixels.
      * @param viewportHeight Viewport height in pixels.
-     * @param orientationMayChange Whether orientation may change during playback.
+     * @param viewportOrientationMayChange Whether orientation may change during playback.
      * @param okHttpClient Set your OkHttp client if you want use it.
      * @param dataSourceCreatorInterface Set your data source if you want use it.
      * @param selectUndeterminedTextLanguage Whether a text track with undetermined language should
@@ -56,6 +57,8 @@ class DataSourceCreator private constructor(
      *     {@link #preferredTextLanguage} is unset.
      * @param forceLowestBitrate Whether to force selection of the single lowest bitrate audio and
      *     video tracks that comply with all other constraints.
+     * @param disabledTextTrackSelectionFlags Bitmask of selection flags that are disabled for text
+     *     track selections. See {@link C.SelectionFlags}.
      */
     data class UrlBuilder(
             val url: String,
@@ -71,16 +74,17 @@ class DataSourceCreator private constructor(
             val exceedRendererCapabilitiesIfNecessary: Boolean = true,
             val viewportWidth: Int = Integer.MAX_VALUE,
             val viewportHeight: Int = Integer.MAX_VALUE,
-            val orientationMayChange: Boolean = true,
+            val viewportOrientationMayChange: Boolean = true,
             val okHttpClient: OkHttpClient? = null,
             val dataSourceCreatorInterface: DataSourceCreatorInterface? = null,
             val selectUndeterminedTextLanguage: Boolean = false,
-            val forceLowestBitrate: Boolean = false
+            val forceLowestBitrate: Boolean = false,
+            val disabledTextTrackSelectionFlags: Int = 0
     ) {
         fun build(): DataSourceCreator = UriBuilder(Uri.parse(url), userAgent, preferredAudioLanguage,
                 preferredTextLanguage, allowMixedMimeAdaptiveness, allowNonSeamlessAdaptiveness,
                 maxVideoWidth, maxVideoHeight, maxVideoBitrate, exceedVideoConstraintsIfNecessary,
-                exceedRendererCapabilitiesIfNecessary, viewportWidth, viewportHeight, orientationMayChange,
+                exceedRendererCapabilitiesIfNecessary, viewportWidth, viewportHeight, viewportOrientationMayChange,
                 okHttpClient, dataSourceCreatorInterface, selectUndeterminedTextLanguage, forceLowestBitrate)
                 .build()
     }
@@ -112,6 +116,8 @@ class DataSourceCreator private constructor(
      *     {@link #preferredTextLanguage} is unset.
      * @param forceLowestBitrate Whether to force selection of the single lowest bitrate audio and
      *     video tracks that comply with all other constraints.
+     * @param disabledTextTrackSelectionFlags Bitmask of selection flags that are disabled for text
+     *     track selections. See {@link C.SelectionFlags}.
      */
     data class UriBuilder(
             val uri: Uri,
@@ -131,12 +137,14 @@ class DataSourceCreator private constructor(
             val okHttpClient: OkHttpClient? = null,
             val dataSourceCreatorInterface: DataSourceCreatorInterface? = null,
             val selectUndeterminedTextLanguage: Boolean = false,
-            val forceLowestBitrate: Boolean = false
+            val forceLowestBitrate: Boolean = false,
+            val disabledTextTrackSelectionFlags: Int = 0
     ) {
         fun build(): DataSourceCreator = DataSourceCreator(uri, userAgent, preferredAudioLanguage,
                 preferredTextLanguage, allowMixedMimeAdaptiveness, allowNonSeamlessAdaptiveness,
                 maxVideoWidth, maxVideoHeight, maxVideoBitrate, exceedVideoConstraintsIfNecessary,
                 exceedRendererCapabilitiesIfNecessary, viewportWidth, viewportHeight, orientationMayChange,
-                okHttpClient, dataSourceCreatorInterface, selectUndeterminedTextLanguage, forceLowestBitrate)
+                okHttpClient, dataSourceCreatorInterface, selectUndeterminedTextLanguage, forceLowestBitrate,
+                disabledTextTrackSelectionFlags)
     }
 }
