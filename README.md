@@ -38,13 +38,12 @@ This is written in Kotlin.
 ```Kotlin
 
 // inject from xml
-val simpleExoPlayerView: SimpleExoPlayerView by bindView(R.id.playerView)
+val playerView: PlayerView by bindView(R.id.playerView)
 
 val playerManager: ExoPlayerManager = ExoPlayerManager(context) 
 
-// inject SimpleExoPlayerView
-// https://github.com/google/ExoPlayer/blob/release-v2/library/src/main/java/com/google/android/exoplayer2/SimpleExoPlayer.java
-playerManager.injectView(simpleExoPlayerView)
+// inject PlayerView
+playerManager.injectView(playerView)
 
 val dataSource = DataSourceCreator.UrlBuilder(
         url = HLS_SAMPLE_URL,
@@ -95,7 +94,7 @@ playerManager.addOnPlayerErrorListener {
     android:layout_height="match_parent"
     android:keepScreenOn="true">
 
-    <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+    <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/playerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -111,7 +110,7 @@ playerManager.addOnPlayerErrorListener {
 
 val adPlayerController: AdPlayerController = AdPlayerController.Builder(
         context = this,
-        simpleExoPlayerView = simpleExoPlayerView,
+        playerView = playerView,
         adUiContainer = adUiContainer,
         language = "us",
         userAgent = Util.getUserAgent(this, "UserAgent"),
