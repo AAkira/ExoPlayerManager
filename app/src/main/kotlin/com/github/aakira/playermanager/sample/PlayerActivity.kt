@@ -22,7 +22,7 @@ class PlayerActivity : Activity() {
     companion object {
         // Apple Hls video [https://developer.apple.com/streaming/examples/]
         const val HLS_SAMPLE_URL =
-                "https://devimages.apple.com.edgekey.net/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8"
+                "https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_ts/master.m3u8"
     }
 
     private val playerView: PlayerView by bindView(R.id.player_view)
@@ -58,7 +58,8 @@ class PlayerActivity : Activity() {
             playerManager.setMaxVideoBitrate((60 * 1000).toLong())
         }
         playBackSpeedButton.setOnClickListener {
-            val currentSpeed = playerManager.getPlayBackParameters()?.speed ?: return@setOnClickListener
+            val currentSpeed = playerManager.getPlayBackParameters()?.speed
+                    ?: return@setOnClickListener
             (if (currentSpeed > 2f) 0.4f else currentSpeed + 0.2f).let {
                 playerManager.setPlaybackParameters(it, 1f)
             }
@@ -69,11 +70,10 @@ class PlayerActivity : Activity() {
         playerManager.addOnVideoSizeChangedListener { width, height, unappliedRotationDegrees, pixelWidthHeightRatio ->
 
         }
-        playerManager.addOnMediaSourceLoadErrorListener {
-            dataSpec: DataSpec?, dataType: Int, trackType: Int,
-            trackFormat: Format?, trackSelectionReason: Int, trackSelectionData: Any?,
-            mediaStartTimeMs: Long, mediaEndTimeMs: Long, elapsedRealtimeMs: Long,
-            loadDurationMs: Long, bytesLoaded: Long, error: IOException?, wasCanceled: Boolean ->
+        playerManager.addOnMediaSourceLoadErrorListener { dataSpec: DataSpec?, dataType: Int, trackType: Int,
+                                                          trackFormat: Format?, trackSelectionReason: Int, trackSelectionData: Any?,
+                                                          mediaStartTimeMs: Long, mediaEndTimeMs: Long, elapsedRealtimeMs: Long,
+                                                          loadDurationMs: Long, bytesLoaded: Long, error: IOException?, wasCanceled: Boolean ->
 
         }
         playerManager.addOnStateChangedListener { playWhenReady: Boolean, playbackState: Int ->
