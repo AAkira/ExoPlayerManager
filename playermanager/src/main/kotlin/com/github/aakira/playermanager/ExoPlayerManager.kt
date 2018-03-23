@@ -28,6 +28,14 @@ class ExoPlayerManager(private val context: Context, private val debugLogger: Bo
 
     var player: SimpleExoPlayer? = null
         private set
+    /**
+     * Reset player position when player resets
+     */
+    var prepareResetPosition: Boolean = false
+    /**
+     * Reset player state when player resets
+     */
+    var prepareResetState: Boolean = false
 
     private val bandwidthMeter = LimitBandwidthMeter()
     private var eventProxy = EventProxy()
@@ -182,7 +190,7 @@ class ExoPlayerManager(private val context: Context, private val debugLogger: Bo
         mediaSource ?: return
 
         if (playerNeedsPrepare) {
-            player?.prepare(mediaSource)
+            player?.prepare(mediaSource, prepareResetPosition, prepareResetState)
             playerNeedsPrepare = false
         }
 
