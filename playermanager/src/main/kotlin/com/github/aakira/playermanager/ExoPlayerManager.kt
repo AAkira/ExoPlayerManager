@@ -38,10 +38,12 @@ class ExoPlayerManager(private val context: Context, private val debugLogger: Bo
     var prepareResetState: Boolean = false
 
     private val bandwidthMeter = LimitBandwidthMeter()
+    private var eventLogger: EventLogger? = null
     private var eventProxy = EventProxy()
     private val mainHandler = Handler()
     private var mediaSource: MediaSource? = null
     private var playerNeedsPrepare = false
+    private var playerView: PlayerView? = null
     private var trackSelector: DefaultTrackSelector? = null
 
     private val onMediaSourceLoadErrorListeners = ArrayList<MediaSourceLoadErrorListener>()
@@ -101,26 +103,13 @@ class ExoPlayerManager(private val context: Context, private val debugLogger: Bo
         }
 
         trackSelector = DefaultTrackSelector(AdaptiveTrackSelection.Factory(bandwidthMeter))
-        player = ExoPlayerFactory.newSimpleInstance(context, trackSelector).apply {
-            addListener(eventProxy)
-            addVideoListener(eventProxy)
-            addMetadataOutput(eventProxy)
-            addVideoDebugListener(eventProxy)
 
-            if (debugLogger) {
-                EventLogger(trackSelector).let {
-                    addListener(it)
-                    addAudioDebugListener(it)
-                    addVideoDebugListener(it)
-                    addMetadataOutput(it)
-                }
-            }
-        }
-        playerNeedsPrepare = true
+        initializePlayer()
     }
 
     fun injectView(playerView: PlayerView) {
         playerView.player = player
+        this.playerView = playerView
     }
 
     fun setHlsSource(dataSourceCreator: DataSourceCreator) {
@@ -184,6 +173,7 @@ class ExoPlayerManager(private val context: Context, private val debugLogger: Bo
         player?.release()
         clearExoPlayerListeners()
         player = null
+        playerView = null
     }
 
     fun play() {
@@ -206,10 +196,22 @@ class ExoPlayerManager(private val context: Context, private val debugLogger: Bo
         playerNeedsPrepare = true
     }
 
+    /**
+     * init player and reconnect to a video stream
+     */
+    fun restart() {
+        player?.release()
+        clearExoPlayerListeners()
+        player = null
+
+        initializePlayer()
+        playerView?.player = player
+        play()
+    }
+
     fun restartCurrentPosition() {
         val positionMs = getCurrentPosition()
-        stop()
-        play()
+        restart()
         seekTo(positionMs)
     }
 
@@ -398,22 +400,37 @@ class ExoPlayerManager(private val context: Context, private val debugLogger: Bo
         onVideoRenderedListeners.clear()
     }
 
+    private fun initializePlayer() {
+        player = ExoPlayerFactory.newSimpleInstance(context, trackSelector).apply {
+            addListener(eventProxy)
+            addVideoListener(eventProxy)
+            addMetadataOutput(eventProxy)
+            addVideoDebugListener(eventProxy)
+
+            if (debugLogger) {
+                eventLogger = EventLogger(trackSelector).also {
+                    addListener(it)
+                    addAudioDebugListener(it)
+                    addVideoDebugListener(it)
+                    addMetadataOutput(it)
+                }
+            }
+        }
+        playerNeedsPrepare = true
+    }
+
     private fun clearExoPlayerListeners() {
         player?.run {
             removeListener(eventProxy)
             removeVideoListener(eventProxy)
             removeMetadataOutput(eventProxy)
             removeVideoDebugListener(eventProxy)
-        }
 
-        if (debugLogger) {
-            player?.run {
-                EventLogger(trackSelector).let {
-                    removeListener(it)
-                    removeAudioDebugListener(it)
-                    removeVideoDebugListener(it)
-                    removeMetadataOutput(it)
-                }
+            eventLogger?.let {
+                removeListener(it)
+                removeAudioDebugListener(it)
+                addVideoDebugListener(it)
+                addMetadataOutput(it)
             }
         }
     }
