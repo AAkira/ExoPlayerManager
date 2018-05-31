@@ -105,7 +105,7 @@ class AdPlayerController private constructor(
                 callback.onError()
             }
         }
-        playerManager.addOnMediaSourceLoadErrorListener { _, _, _, _, _, _, _, _, _, _, _, _, _ ->
+        playerManager.addOnMediaSourceLoadErrorListener { _, _, _, _, _ ->
             if (!isAdDisplayed) return@addOnMediaSourceLoadErrorListener
 
             for (callback in adCallbacks) {

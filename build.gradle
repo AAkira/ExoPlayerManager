@@ -16,7 +16,7 @@ buildscript {
 
     // Base libraries
     ext.KOTLIN_VERSION = "1.2.30"
-    ext.EXO_PLAYER_VERSION = "2.7.3"
+    ext.EXO_PLAYER_VERSION = "2.8.1"
     ext.IMA_VERSION = "3.7.2"
 
     // Others
