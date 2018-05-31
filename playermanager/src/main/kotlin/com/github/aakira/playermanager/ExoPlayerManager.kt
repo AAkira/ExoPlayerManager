@@ -47,7 +47,6 @@ class ExoPlayerManager(private val context: Context,
     private var trackSelector: DefaultTrackSelector? = null
 
     private val onMediaSourceLoadErrorListeners = ArrayList<MediaSourceLoadErrorListener>()
-    private var onAudioCapabilitiesChangedListeners = ArrayList<AudioCapabilitiesChangedListener>()
     private val onMetadataListeners = ArrayList<MetadataListener>()
     private val onPlaybackParametersListeners = ArrayList<PlaybackParametersChangedListener>()
     private val onPlayerErrorListeners = ArrayList<PlayerErrorListener>()
@@ -261,18 +260,6 @@ class ExoPlayerManager(private val context: Context,
 
     fun clearMediaSourceErrorListeners() {
         onMediaSourceLoadErrorListeners.clear()
-    }
-
-    fun addOnAudioCapabilitiesChangedListener(listener: AudioCapabilitiesChangedListener) {
-        onAudioCapabilitiesChangedListeners.add(listener)
-    }
-
-    fun removeAudioCapabilitiesReceiverListener(listener: AudioCapabilitiesChangedListener) {
-        onAudioCapabilitiesChangedListeners.remove(listener)
-    }
-
-    fun clearAudioCapabilitiesReceiverListeners() {
-        onAudioCapabilitiesChangedListeners.clear()
     }
 
     fun addOnMetadataListener(listener: MetadataListener) {

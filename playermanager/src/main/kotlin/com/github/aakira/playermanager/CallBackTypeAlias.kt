@@ -2,7 +2,6 @@ package com.github.aakira.playermanager
 
 import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.analytics.AnalyticsListener
-import com.google.android.exoplayer2.audio.AudioCapabilities
 import com.google.android.exoplayer2.metadata.Metadata
 import com.google.android.exoplayer2.source.MediaSourceEventListener
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
@@ -44,11 +43,6 @@ typealias MetadataListener = (eventTime: AnalyticsListener.EventTime?, metadata:
 typealias VideoSizeChangedListener = (eventTime: AnalyticsListener.EventTime?, width: Int,
                                       height: Int, unappliedRotationDegrees: Int,
                                       pixelWidthHeightRatio: Float) -> Unit
-
-/**
- * See [com.google.android.exoplayer2.audio.AudioCapabilitiesReceiver.Listener.onAudioCapabilitiesChanged]
- */
-typealias AudioCapabilitiesChangedListener = (AudioCapabilities) -> Unit
 
 /**
  * See [com.google.android.exoplayer2.source.MediaSourceEventListener.onLoadError]

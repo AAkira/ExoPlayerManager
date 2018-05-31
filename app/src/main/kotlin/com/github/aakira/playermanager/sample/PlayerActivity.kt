@@ -61,9 +61,6 @@ class PlayerActivity : Activity() {
                 playerManager.setPlaybackParameters(it, 1f)
             }
         }
-        playerManager.addOnAudioCapabilitiesChangedListener {
-
-        }
         playerManager.addOnVideoSizeChangedListener { eventTime, width, height, unappliedRotationDegrees,
                                                       pixelWidthHeightRatio ->
 
