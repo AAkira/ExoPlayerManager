@@ -1,30 +1,31 @@
 package com.github.aakira.playermanager
 
 import android.content.Context
-import android.os.Handler
 import com.google.android.exoplayer2.BuildConfig
 import com.google.android.exoplayer2.ExoPlayerFactory
-import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.analytics.AnalyticsCollector
+import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.source.MediaSourceEventListener
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DataSpec
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.upstream.TransferListener
 import okhttp3.OkHttpClient
 import java.io.IOException
 
-class ExoPlayerManager(private val context: Context, private val debugLogger: Boolean = BuildConfig.DEBUG) {
+class ExoPlayerManager(private val context: Context,
+                       private val debugLogger: Boolean = BuildConfig.DEBUG) {
 
     var player: SimpleExoPlayer? = null
         private set
@@ -40,14 +41,12 @@ class ExoPlayerManager(private val context: Context, private val debugLogger: Bo
     private val bandwidthMeter = LimitBandwidthMeter()
     private var eventLogger: EventLogger? = null
     private var eventProxy = EventProxy()
-    private val mainHandler = Handler()
     private var mediaSource: MediaSource? = null
     private var playerNeedsPrepare = false
     private var playerView: PlayerView? = null
     private var trackSelector: DefaultTrackSelector? = null
 
     private val onMediaSourceLoadErrorListeners = ArrayList<MediaSourceLoadErrorListener>()
-    private var onAudioCapabilitiesChangedListeners = ArrayList<AudioCapabilitiesChangedListener>()
     private val onMetadataListeners = ArrayList<MetadataListener>()
     private val onPlaybackParametersListeners = ArrayList<PlaybackParametersChangedListener>()
     private val onPlayerErrorListeners = ArrayList<PlayerErrorListener>()
@@ -58,24 +57,16 @@ class ExoPlayerManager(private val context: Context, private val debugLogger: Bo
     private val onVideoRenderedListeners = ArrayList<VideoRenderedListener>()
 
     init {
-        eventProxy.onMediaSourceLoadErrorListener = { dataSpec: DataSpec?, dataType: Int, trackType: Int, trackFormat: Format?,
-                                                      trackSelectionReason: Int, trackSelectionData: Any?,
-                                                      mediaStartTimeMs: Long, mediaEndTimeMs: Long, elapsedRealtimeMs: Long,
-                                                      loadDurationMs: Long, bytesLoaded: Long, error: IOException?, wasCanceled: Boolean ->
-
+        eventProxy.onMediaSourceLoadErrorListener = { eventTime: AnalyticsListener.EventTime?,
+                                                      loadEventInfo: MediaSourceEventListener.LoadEventInfo?,
+                                                      mediaLoadData: MediaSourceEventListener.MediaLoadData?,
+                                                      error: IOException?, wasCanceled: Boolean ->
             onMediaSourceLoadErrorListeners.forEach {
-                it.invoke(dataSpec, dataType, trackType, trackFormat, trackSelectionReason,
-                        trackSelectionData, mediaStartTimeMs, mediaEndTimeMs, elapsedRealtimeMs,
-                        loadDurationMs, bytesLoaded, error, wasCanceled)
+                it.invoke(eventTime, loadEventInfo, mediaLoadData, error, wasCanceled)
             }
         }
-        eventProxy.onAudioCapabilitiesChangedListener = {
-            onAudioCapabilitiesChangedListeners.forEach { listener ->
-                listener.invoke(it)
-            }
-        }
-        eventProxy.onMetadataListener = {
-            onMetadataListeners.forEach { listener -> listener.invoke(it) }
+        eventProxy.onMetadataListener = {eventTime, metadata ->
+            onMetadataListeners.forEach { listener -> listener.invoke(eventTime, metadata) }
         }
         eventProxy.onPlaybackParametersChangedListener = {
             onPlaybackParametersListeners.forEach { listener -> listener.invoke(it) }
@@ -93,9 +84,9 @@ class ExoPlayerManager(private val context: Context, private val debugLogger: Bo
         eventProxy.onTracksChangedListener = {
             onTracksChangedListeners.forEach { listener -> listener.invoke(it) }
         }
-        eventProxy.onVideoSizeChangedListener = { width, height, unappliedRotationDegrees, pixelWidthHeightRatio ->
+        eventProxy.onVideoSizeChangedListener = { eventTime ,width, height, unappliedRotationDegrees, pixelWidthHeightRatio ->
             onVideoSizeChangedListeners.forEach {
-                it.invoke(width, height, unappliedRotationDegrees, pixelWidthHeightRatio)
+                it.invoke(eventTime, width, height, unappliedRotationDegrees, pixelWidthHeightRatio)
             }
         }
         eventProxy.onVideoRenderedListener = {
@@ -135,7 +126,7 @@ class ExoPlayerManager(private val context: Context, private val debugLogger: Bo
                     dataSourceCreator.dataSourceCreatorInterface.create(context, bandwidthMeter, dataSource)
                 } ?: dataSource
         )
-                .createMediaSource(dataSourceCreator.uri, mainHandler, eventProxy)
+                .createMediaSource(dataSourceCreator.uri)
 
         playerNeedsPrepare = true
     }
@@ -164,7 +155,7 @@ class ExoPlayerManager(private val context: Context, private val debugLogger: Bo
                 } ?: dataSource
         )
                 .setExtractorsFactory(DefaultExtractorsFactory())
-                .createMediaSource(dataSourceCreator.uri, mainHandler, eventProxy)
+                .createMediaSource(dataSourceCreator.uri)
 
         playerNeedsPrepare = true
     }
@@ -271,18 +262,6 @@ class ExoPlayerManager(private val context: Context, private val debugLogger: Bo
         onMediaSourceLoadErrorListeners.clear()
     }
 
-    fun addOnAudioCapabilitiesChangedListener(listener: AudioCapabilitiesChangedListener) {
-        onAudioCapabilitiesChangedListeners.add(listener)
-    }
-
-    fun removeAudioCapabilitiesReceiverListener(listener: AudioCapabilitiesChangedListener) {
-        onAudioCapabilitiesChangedListeners.remove(listener)
-    }
-
-    fun clearAudioCapabilitiesReceiverListeners() {
-        onAudioCapabilitiesChangedListeners.clear()
-    }
-
     fun addOnMetadataListener(listener: MetadataListener) {
         onMetadataListeners.add(listener)
     }
@@ -371,14 +350,16 @@ class ExoPlayerManager(private val context: Context, private val debugLogger: Bo
      * @see [addOnMediaSourceLoadErrorListener]
      */
     @Deprecated("Merge MediaSourceLoadErrorListener")
-    fun addOnExtractorMediaSourceLoadErrorListener(listener: ExtractorMediaSourceLoadErrorListener) {
+    fun addOnExtractorMediaSourceLoadErrorListener(
+            listener: ExtractorMediaSourceLoadErrorListener) {
     }
 
     /**
      * @see [removeMediaSourceErrorListener]
      */
     @Deprecated("Merge MediaSourceLoadErrorListener")
-    fun removeExtractorMediaSourceLoadErrorListener(listener: ExtractorMediaSourceLoadErrorListener) {
+    fun removeExtractorMediaSourceLoadErrorListener(
+            listener: ExtractorMediaSourceLoadErrorListener) {
     }
 
     /**
@@ -401,36 +382,29 @@ class ExoPlayerManager(private val context: Context, private val debugLogger: Bo
     }
 
     private fun initializePlayer() {
+        AnalyticsCollector.Factory()
         player = ExoPlayerFactory.newSimpleInstance(context, trackSelector).apply {
             addListener(eventProxy)
-            addVideoListener(eventProxy)
-            addMetadataOutput(eventProxy)
-            addVideoDebugListener(eventProxy)
+            addAnalyticsListener(eventProxy)
 
             if (debugLogger) {
                 eventLogger = EventLogger(trackSelector).also {
-                    addListener(it)
-                    addAudioDebugListener(it)
-                    addVideoDebugListener(it)
-                    addMetadataOutput(it)
+                    addAnalyticsListener(it)
                 }
             }
         }
         playerNeedsPrepare = true
+
+        player?.analyticsCollector
     }
 
     private fun clearExoPlayerListeners() {
         player?.run {
             removeListener(eventProxy)
-            removeVideoListener(eventProxy)
-            removeMetadataOutput(eventProxy)
-            removeVideoDebugListener(eventProxy)
+            removeAnalyticsListener(eventProxy)
 
             eventLogger?.let {
-                removeListener(it)
-                removeAudioDebugListener(it)
-                addVideoDebugListener(it)
-                addMetadataOutput(it)
+                removeAnalyticsListener(it)
             }
         }
     }
@@ -441,13 +415,15 @@ class ExoPlayerManager(private val context: Context, private val debugLogger: Bo
         buildOkHttpDataSourceFactory(userAgent, bandwidthMeter, okHttpClient)
     } ?: buildDefaultHttpDataSourceFactory(userAgent, bandwidthMeter)
 
-    private fun buildDefaultHttpDataSourceFactory(userAgent: String, listener: TransferListener<in DataSource>,
+    private fun buildDefaultHttpDataSourceFactory(userAgent: String,
+                                                  listener: TransferListener<in DataSource>,
                                                   allowCrossProtocolRedirects: Boolean = false) =
             DefaultHttpDataSourceFactory(userAgent, listener,
                     DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS,
                     DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS, allowCrossProtocolRedirects)
 
-    private fun buildOkHttpDataSourceFactory(userAgent: String, listener: TransferListener<in DataSource>,
+    private fun buildOkHttpDataSourceFactory(userAgent: String,
+                                             listener: TransferListener<in DataSource>,
                                              okHttpClient: OkHttpClient) =
             OkHttpDataSourceFactory(okHttpClient, userAgent, listener)
 }

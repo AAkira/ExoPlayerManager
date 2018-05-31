@@ -5,14 +5,11 @@ import android.os.Bundle
 import android.widget.Button
 import com.github.aakira.playermanager.DataSourceCreator
 import com.github.aakira.playermanager.ExoPlayerManager
-import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.upstream.DataSpec
 import com.google.android.exoplayer2.util.Util
 import kotterknife.bindView
 import timber.log.Timber
-import java.io.IOException
 
 /**
  * An activity that plays media using [SimpleExoPlayer].
@@ -64,16 +61,12 @@ class PlayerActivity : Activity() {
                 playerManager.setPlaybackParameters(it, 1f)
             }
         }
-        playerManager.addOnAudioCapabilitiesChangedListener {
+        playerManager.addOnVideoSizeChangedListener { eventTime, width, height, unappliedRotationDegrees,
+                                                      pixelWidthHeightRatio ->
 
         }
-        playerManager.addOnVideoSizeChangedListener { width, height, unappliedRotationDegrees, pixelWidthHeightRatio ->
-
-        }
-        playerManager.addOnMediaSourceLoadErrorListener { dataSpec: DataSpec?, dataType: Int, trackType: Int,
-                                                          trackFormat: Format?, trackSelectionReason: Int, trackSelectionData: Any?,
-                                                          mediaStartTimeMs: Long, mediaEndTimeMs: Long, elapsedRealtimeMs: Long,
-                                                          loadDurationMs: Long, bytesLoaded: Long, error: IOException?, wasCanceled: Boolean ->
+        playerManager.addOnMediaSourceLoadErrorListener { eventTime, loadEventInfo, mediaLoadData,
+                                                          error, wasCanceled ->
 
         }
         playerManager.addOnStateChangedListener { playWhenReady: Boolean, playbackState: Int ->

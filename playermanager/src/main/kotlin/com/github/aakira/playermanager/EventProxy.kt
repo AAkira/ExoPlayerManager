@@ -1,30 +1,23 @@
 package com.github.aakira.playermanager
 
+import android.net.NetworkInfo
 import android.view.Surface
+import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.Timeline
-import com.google.android.exoplayer2.audio.AudioCapabilities
-import com.google.android.exoplayer2.audio.AudioCapabilitiesReceiver
+import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.decoder.DecoderCounters
 import com.google.android.exoplayer2.metadata.Metadata
-import com.google.android.exoplayer2.metadata.MetadataOutput
 import com.google.android.exoplayer2.source.MediaSourceEventListener
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
-import com.google.android.exoplayer2.upstream.DataSpec
-import com.google.android.exoplayer2.video.VideoListener
-import com.google.android.exoplayer2.video.VideoRendererEventListener
 import java.io.IOException
+import java.lang.Exception
 
-class EventProxy : Player.EventListener,
-        MetadataOutput,
-        VideoListener,
-        AudioCapabilitiesReceiver.Listener,
-        VideoRendererEventListener,
-        MediaSourceEventListener {
+class EventProxy : Player.DefaultEventListener(), AnalyticsListener {
 
     var onTracksChangedListener: TracksChangedListener? = null
     var onPlayerStateChangedListener: PlayerStateChangedListener? = null
@@ -33,7 +26,6 @@ class EventProxy : Player.EventListener,
     var onRepeatModeChangedListener: RepeatModeChangedListener? = null
     var onMetadataListener: MetadataListener? = null
     var onVideoSizeChangedListener: VideoSizeChangedListener? = null
-    var onAudioCapabilitiesChangedListener: AudioCapabilitiesChangedListener? = null
     var onMediaSourceLoadErrorListener: MediaSourceLoadErrorListener? = null
     var onVideoRenderedListener: VideoRenderedListener? = null
 
@@ -43,7 +35,8 @@ class EventProxy : Player.EventListener,
     }
 
     // Player.EventListener
-    override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
+    override fun onTracksChanged(trackGroups: TrackGroupArray,
+                                 trackSelections: TrackSelectionArray) {
         this.onTracksChangedListener?.invoke(trackSelections)
     }
 
@@ -87,97 +80,285 @@ class EventProxy : Player.EventListener,
         // Do nothing.
     }
 
-    // MetadataRenderer.Output
-    override fun onMetadata(metadata: Metadata) {
-        onMetadataListener?.invoke(metadata)
+    /**
+     * AnalyticsListener
+     * repeated [onTimelineChanged]
+     */
+    override fun onTimelineChanged(eventTime: AnalyticsListener.EventTime?, reason: Int) {
+        // Repeated the Player.EventListener
     }
 
-    // SimpleExoPlayer.VideoListener
-    override fun onVideoSizeChanged(width: Int, height: Int, unappliedRotationDegrees: Int,
+    /**
+     * AnalyticsListener
+     * repeated [onTracksChanged]
+     */
+    override fun onTracksChanged(eventTime: AnalyticsListener.EventTime?,
+                                 trackGroups: TrackGroupArray?,
+                                 trackSelections: TrackSelectionArray?) {
+        // Repeated the Player.EventListener
+    }
+
+    /**
+     * AnalyticsListener
+     * repeated [onPlayerStateChanged]
+     */
+    override fun onLoadingChanged(eventTime: AnalyticsListener.EventTime?, isLoading: Boolean) {
+        // Repeated the Player.EventListener
+    }
+
+    /**
+     * AnalyticsListener
+     * repeated [onPlayerStateChanged]
+     */
+    override fun onPlayerStateChanged(eventTime: AnalyticsListener.EventTime?,
+                                      playWhenReady: Boolean, playbackState: Int) {
+        // Repeated the Player.EventListener
+    }
+
+    /**
+     * AnalyticsListener
+     * repeated [onRepeatModeChanged]
+     */
+    override fun onRepeatModeChanged(eventTime: AnalyticsListener.EventTime?, repeatMode: Int) {
+        // Repeated the Player.EventListener
+    }
+
+    /**
+     * AnalyticsListener
+     * repeated [onPlayerError]
+     */
+    override fun onPlayerError(eventTime: AnalyticsListener.EventTime?,
+                               error: ExoPlaybackException?) {
+        // Repeated the Player.EventListener
+    }
+
+    /**
+     * AnalyticsListener
+     * repeated [onPositionDiscontinuity]
+     */
+    override fun onPositionDiscontinuity(eventTime: AnalyticsListener.EventTime?, reason: Int) {
+        // Repeated the Player.EventListener
+    }
+
+    /**
+     * AnalyticsListener
+     * repeated [onPlaybackParametersChanged]
+     */
+    override fun onPlaybackParametersChanged(eventTime: AnalyticsListener.EventTime?,
+                                             playbackParameters: PlaybackParameters?) {
+        // Repeated the Player.EventListener
+    }
+
+    /**
+     * AnalyticsListener
+     * repeated [onSeekProcessed]
+     */
+    override fun onSeekProcessed(eventTime: AnalyticsListener.EventTime?) {
+        // Repeated the Player.EventListener
+    }
+
+    /**
+     * AnalyticsListener
+     * [com.google.android.exoplayer2.metadata.MetadataOutput.onMetadata]
+     **/
+    override fun onMetadata(eventTime: AnalyticsListener.EventTime?, metadata: Metadata?) {
+        onMetadataListener?.invoke(eventTime, metadata)
+    }
+
+    // AnalyticsListener
+    /**
+     * AnalyticsListener
+     * [com.google.android.exoplayer2.video.VideoListener.onVideoSizeChanged]
+     * [com.google.android.exoplayer2.video.VideoRendererEventListener.onVideoSizeChanged]
+     **/
+    override fun onVideoSizeChanged(eventTime: AnalyticsListener.EventTime?, width: Int,
+                                    height: Int, unappliedRotationDegrees: Int,
                                     pixelWidthHeightRatio: Float) {
-        onVideoSizeChangedListener?.invoke(width, height, unappliedRotationDegrees, pixelWidthHeightRatio)
+        onVideoSizeChangedListener?.invoke(eventTime, width, height, unappliedRotationDegrees,
+                pixelWidthHeightRatio)
     }
 
-    // SimpleExoPlayer.VideoListener
-    override fun onRenderedFirstFrame() {
+    /**
+     * AnalyticsListener
+     * [com.google.android.exoplayer2.video.VideoRendererEventListener.onRenderedFirstFrame]
+     **/
+    override fun onRenderedFirstFrame(eventTime: AnalyticsListener.EventTime?, surface: Surface?) {
         // Do nothing.
     }
 
-    // AudioCapabilitiesReceiver.Listener
-    override fun onAudioCapabilitiesChanged(audioCapabilities: AudioCapabilities) {
-        onAudioCapabilitiesChangedListener?.invoke(audioCapabilities)
-    }
-
-    // MediaSourceEventListener
-    override fun onLoadStarted(dataSpec: DataSpec?, dataType: Int, trackType: Int, trackFormat: Format?,
-                               trackSelectionReason: Int, trackSelectionData: Any?, mediaStartTimeMs: Long,
-                               mediaEndTimeMs: Long, elapsedRealtimeMs: Long) {
+    /**
+     * AnalyticsListener
+     * [com.google.android.exoplayer2.source.MediaSourceEventListener.onLoadStarted]
+     **/
+    override fun onLoadStarted(eventTime: AnalyticsListener.EventTime?,
+                               loadEventInfo: MediaSourceEventListener.LoadEventInfo?,
+                               mediaLoadData: MediaSourceEventListener.MediaLoadData?) {
         // Do nothing.
     }
 
-    // MediaSourceEventListener
-    override fun onDownstreamFormatChanged(trackType: Int, trackFormat: Format?, trackSelectionReason: Int,
-                                           trackSelectionData: Any?, mediaTimeMs: Long) {
+    /**
+     * AnalyticsListener
+     * [com.google.android.exoplayer2.source.MediaSourceEventListener.onDownstreamFormatChanged]
+     **/
+    override fun onDownstreamFormatChanged(eventTime: AnalyticsListener.EventTime?,
+                                           mediaLoadData: MediaSourceEventListener.MediaLoadData?) {
         // Do nothing.
     }
 
-    // MediaSourceEventListener
-    override fun onUpstreamDiscarded(trackType: Int, mediaStartTimeMs: Long, mediaEndTimeMs: Long) {
+    /**
+     * AnalyticsListener
+     * [com.google.android.exoplayer2.source.MediaSourceEventListener.onUpstreamDiscarded]
+     **/
+    override fun onUpstreamDiscarded(eventTime: AnalyticsListener.EventTime?,
+                                     mediaLoadData: MediaSourceEventListener.MediaLoadData?) {
         // Do nothing.
     }
 
-    // MediaSourceEventListener
-    override fun onLoadCanceled(dataSpec: DataSpec?, dataType: Int, trackType: Int, trackFormat: Format?,
-                                trackSelectionReason: Int, trackSelectionData: Any?, mediaStartTimeMs: Long,
-                                mediaEndTimeMs: Long, elapsedRealtimeMs: Long, loadDurationMs: Long, bytesLoaded: Long) {
+    /**
+     * AnalyticsListener
+     * [com.google.android.exoplayer2.source.MediaSourceEventListener.onLoadCanceled]
+     **/
+    override fun onLoadCanceled(eventTime: AnalyticsListener.EventTime?,
+                                loadEventInfo: MediaSourceEventListener.LoadEventInfo?,
+                                mediaLoadData: MediaSourceEventListener.MediaLoadData?) {
         // Do nothing.
     }
 
-    // MediaSourceEventListener
-    override fun onLoadCompleted(dataSpec: DataSpec?, dataType: Int, trackType: Int, trackFormat: Format?,
-                                 trackSelectionReason: Int, trackSelectionData: Any?, mediaStartTimeMs: Long,
-                                 mediaEndTimeMs: Long, elapsedRealtimeMs: Long, loadDurationMs: Long, bytesLoaded: Long) {
+    /**
+     * AnalyticsListener
+     * [com.google.android.exoplayer2.source.MediaSourceEventListener.onLoadCompleted]
+     **/
+    override fun onLoadCompleted(eventTime: AnalyticsListener.EventTime?,
+                                 loadEventInfo: MediaSourceEventListener.LoadEventInfo?,
+                                 mediaLoadData: MediaSourceEventListener.MediaLoadData?) {
         // Do nothing.
     }
 
-    // MediaSourceEventListener
-    override fun onLoadError(dataSpec: DataSpec?, dataType: Int, trackType: Int, trackFormat: Format?,
-                             trackSelectionReason: Int, trackSelectionData: Any?, mediaStartTimeMs: Long,
-                             mediaEndTimeMs: Long, elapsedRealtimeMs: Long, loadDurationMs: Long,
-                             bytesLoaded: Long, error: IOException?, wasCanceled: Boolean) {
-        onMediaSourceLoadErrorListener?.invoke(dataSpec, dataType, trackType, trackFormat,
-                trackSelectionReason, trackSelectionData, mediaStartTimeMs,
-                mediaEndTimeMs, elapsedRealtimeMs, loadDurationMs,
-                bytesLoaded, error, wasCanceled)
+    /**
+     * AnalyticsListener
+     * [com.google.android.exoplayer2.source.MediaSourceEventListener.onLoadError]
+     **/
+    override fun onLoadError(eventTime: AnalyticsListener.EventTime?,
+                             loadEventInfo: MediaSourceEventListener.LoadEventInfo?,
+                             mediaLoadData: MediaSourceEventListener.MediaLoadData?,
+                             error: IOException?, wasCanceled: Boolean) {
+        onMediaSourceLoadErrorListener?.invoke(eventTime, loadEventInfo, mediaLoadData, error,
+                wasCanceled)
     }
 
-    // VideoRendererEventListener
-    override fun onRenderedFirstFrame(surface: Surface?) {
+    /**
+     * AnalyticsListener
+     * [com.google.android.exoplayer2.source.MediaSourceEventListener.onMediaPeriodCreated]
+     **/
+    override fun onMediaPeriodCreated(eventTime: AnalyticsListener.EventTime?) {
         // Do nothing.
     }
 
-    // VideoRendererEventListener
-    override fun onDroppedFrames(count: Int, elapsedMs: Long) {
+    /**
+     * AnalyticsListener
+     * [com.google.android.exoplayer2.source.MediaSourceEventListener.onMediaPeriodReleased]
+     **/
+    override fun onMediaPeriodReleased(eventTime: AnalyticsListener.EventTime?) {
         // Do nothing.
     }
 
-    // VideoRendererEventListener
-    override fun onVideoDecoderInitialized(decoderName: String?, initializedTimestampMs: Long, initializationDurationMs: Long) {
+    /**
+     * AnalyticsListener
+     * [com.google.android.exoplayer2.source.MediaSourceEventListener.onReadingStarted]
+     **/
+    override fun onReadingStarted(eventTime: AnalyticsListener.EventTime?) {
         // Do nothing.
     }
 
-    // VideoRendererEventListener
-    override fun onVideoEnabled(counters: DecoderCounters?) {
-        onVideoRenderedListener?.invoke(true)
+    // AnalyticsListener
+    override fun onSeekStarted(eventTime: AnalyticsListener.EventTime?) {
     }
 
-    // VideoRendererEventListener
-    override fun onVideoDisabled(counters: DecoderCounters?) {
-        onVideoRenderedListener?.invoke(false)
+    // AnalyticsListener
+    override fun onDrmKeysLoaded(eventTime: AnalyticsListener.EventTime?) {
     }
 
-    // VideoRendererEventListener
-    override fun onVideoInputFormatChanged(format: Format?) {
-        // Do nothing.
+    // AnalyticsListener
+    override fun onBandwidthEstimate(eventTime: AnalyticsListener.EventTime?, totalLoadTimeMs: Int,
+                                     totalBytesLoaded: Long, bitrateEstimate: Long) {
+    }
+
+    // AnalyticsListener
+    override fun onNetworkTypeChanged(eventTime: AnalyticsListener.EventTime?,
+                                      networkInfo: NetworkInfo?) {
+    }
+
+    // AnalyticsListener
+    override fun onViewportSizeChange(eventTime: AnalyticsListener.EventTime?, width: Int,
+                                      height: Int) {
+    }
+
+    // AnalyticsListener
+    override fun onDrmKeysRestored(eventTime: AnalyticsListener.EventTime?) {
+    }
+
+    /**
+     * AnalyticsListener
+     * [com.google.android.exoplayer2.video.VideoRendererEventListener.onVideoDisabled]
+     **/
+    override fun onDecoderDisabled(eventTime: AnalyticsListener.EventTime?, trackType: Int,
+                                   decoderCounters: DecoderCounters?) {
+        if (trackType == C.TRACK_TYPE_VIDEO) onVideoRenderedListener?.invoke(false)
+    }
+
+    // AnalyticsListener
+    override fun onShuffleModeChanged(eventTime: AnalyticsListener.EventTime?,
+                                      shuffleModeEnabled: Boolean) {
+    }
+
+    /**
+     * AnalyticsListener
+     * [com.google.android.exoplayer2.video.VideoRendererEventListener.onVideoInputFormatChanged]
+     **/
+    override fun onDecoderInputFormatChanged(eventTime: AnalyticsListener.EventTime?,
+                                             trackType: Int, format: Format?) {
+    }
+
+    // AnalyticsListener
+    override fun onAudioSessionId(eventTime: AnalyticsListener.EventTime?, audioSessionId: Int) {
+    }
+
+    // AnalyticsListener
+    override fun onDrmSessionManagerError(eventTime: AnalyticsListener.EventTime?,
+                                          error: Exception?) {
+    }
+
+    /**
+     * AnalyticsListener
+     * [com.google.android.exoplayer2.video.VideoRendererEventListener.onVideoDecoderInitialized]
+     **/
+    override fun onDecoderInitialized(eventTime: AnalyticsListener.EventTime?, trackType: Int,
+                                      decoderName: String?, initializationDurationMs: Long) {
+    }
+
+    /**
+     * AnalyticsListener
+     * [com.google.android.exoplayer2.video.VideoRendererEventListener.onDroppedFrames]
+     **/
+    override fun onDroppedVideoFrames(eventTime: AnalyticsListener.EventTime?, droppedFrames: Int,
+                                      elapsedMs: Long) {
+    }
+
+    /**
+     * AnalyticsListener
+     * [com.google.android.exoplayer2.video.VideoRendererEventListener.onVideoEnabled]
+     **/
+    override fun onDecoderEnabled(eventTime: AnalyticsListener.EventTime?, trackType: Int,
+                                  decoderCounters: DecoderCounters?) {
+        if (trackType == C.TRACK_TYPE_VIDEO) onVideoRenderedListener?.invoke(true)
+    }
+
+    // AnalyticsListener
+    override fun onAudioUnderrun(eventTime: AnalyticsListener.EventTime?, bufferSize: Int,
+                                 bufferSizeMs: Long, elapsedSinceLastFeedMs: Long) {
+    }
+
+    // AnalyticsListener
+    override fun onDrmKeysRemoved(eventTime: AnalyticsListener.EventTime?) {
     }
 }

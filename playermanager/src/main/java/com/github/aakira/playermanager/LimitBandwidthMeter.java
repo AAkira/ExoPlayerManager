@@ -16,12 +16,13 @@
 package com.github.aakira.playermanager;
 
 import android.os.Handler;
-import android.os.SystemClock;
+import android.support.annotation.Nullable;
 
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.TransferListener;
 import com.google.android.exoplayer2.util.Assertions;
+import com.google.android.exoplayer2.util.Clock;
 import com.google.android.exoplayer2.util.SlidingPercentile;
 
 /**
@@ -30,17 +31,98 @@ import com.google.android.exoplayer2.util.SlidingPercentile;
  */
 public final class LimitBandwidthMeter implements BandwidthMeter, TransferListener<Object> {
 
-    /**
-     * The default maximum weight for the sliding window.
-     */
-    public static final int DEFAULT_MAX_WEIGHT = 2000;
+    /** Default initial bitrate estimate in bits per second. */
+    public static final long DEFAULT_INITIAL_BITRATE_ESTIMATE = 1_000_000;
+
+    /** Default maximum weight for the sliding window. */
+    public static final int DEFAULT_SLIDING_WINDOW_MAX_WEIGHT = 2000;
+
+    /** Builder for a bandwidth meter. */
+    public static final class Builder {
+
+        private @Nullable Handler eventHandler;
+        private @Nullable EventListener eventListener;
+        private long initialBitrateEstimate;
+        private int slidingWindowMaxWeight;
+        private Clock clock;
+
+        /** Creates a builder with default parameters and without listener. */
+        public Builder() {
+            initialBitrateEstimate = DEFAULT_INITIAL_BITRATE_ESTIMATE;
+            slidingWindowMaxWeight = DEFAULT_SLIDING_WINDOW_MAX_WEIGHT;
+            clock = Clock.DEFAULT;
+        }
+
+        /**
+         * Sets an event listener for new bandwidth estimates.
+         *
+         * @param eventHandler A handler for events.
+         * @param eventListener A listener of events.
+         * @return This builder.
+         * @throws IllegalArgumentException If the event handler or listener are null.
+         */
+        public Builder setEventListener(Handler eventHandler, EventListener eventListener) {
+            Assertions.checkArgument(eventHandler != null && eventListener != null);
+            this.eventHandler = eventHandler;
+            this.eventListener = eventListener;
+            return this;
+        }
+
+        /**
+         * Sets the maximum weight for the sliding window.
+         *
+         * @param slidingWindowMaxWeight The maximum weight for the sliding window.
+         * @return This builder.
+         */
+        public Builder setSlidingWindowMaxWeight(int slidingWindowMaxWeight) {
+            this.slidingWindowMaxWeight = slidingWindowMaxWeight;
+            return this;
+        }
+
+        /**
+         * Sets the initial bitrate estimate in bits per second that should be assumed when a bandwidth
+         * estimate is unavailable.
+         *
+         * @param initialBitrateEstimate The initial bitrate estimate in bits per second.
+         * @return This builder.
+         */
+        public Builder setInitialBitrateEstimate(long initialBitrateEstimate) {
+            this.initialBitrateEstimate = initialBitrateEstimate;
+            return this;
+        }
+
+        /**
+         * Sets the clock used to estimate bandwidth from data transfers. Should only be set for testing
+         * purposes.
+         *
+         * @param clock The clock used to estimate bandwidth from data transfers.
+         * @return This builder.
+         */
+        public Builder setClock(Clock clock) {
+            this.clock = clock;
+            return this;
+        }
+
+        /**
+         * Builds the bandwidth meter.
+         *
+         * @return A bandwidth meter with the configured properties.
+         */
+        public LimitBandwidthMeter build() {
+            return new LimitBandwidthMeter(
+                    eventHandler, eventListener, initialBitrateEstimate, slidingWindowMaxWeight, clock);
+        }
+    }
+
+    private long limitBitrate = Long.MAX_VALUE;
 
     private static final int ELAPSED_MILLIS_FOR_ESTIMATE = 2000;
     private static final int BYTES_TRANSFERRED_FOR_ESTIMATE = 512 * 1024;
 
-    private final Handler eventHandler;
-    private final EventListener eventListener;
+    private final @Nullable Handler eventHandler;
+    private final @Nullable EventListener eventListener;
     private final SlidingPercentile slidingPercentile;
+    private final Clock clock;
 
     private int streamCount;
     private long sampleStartTimeMs;
@@ -50,21 +132,44 @@ public final class LimitBandwidthMeter implements BandwidthMeter, TransferListen
     private long totalBytesTransferred;
     private long bitrateEstimate;
 
-    private long limitBitrate = Long.MAX_VALUE;
-
+    /** Creates a bandwidth meter with default parameters. */
     public LimitBandwidthMeter() {
-        this(null, null);
+        this(
+                /* eventHandler= */ null,
+                /* eventListener= */ null,
+                DEFAULT_INITIAL_BITRATE_ESTIMATE,
+                DEFAULT_SLIDING_WINDOW_MAX_WEIGHT,
+                Clock.DEFAULT);
     }
 
+    /** @deprecated Use {@link Builder} instead. */
+    @Deprecated
     public LimitBandwidthMeter(Handler eventHandler, EventListener eventListener) {
-        this(eventHandler, eventListener, DEFAULT_MAX_WEIGHT);
+        this(
+                eventHandler,
+                eventListener,
+                DEFAULT_INITIAL_BITRATE_ESTIMATE,
+                DEFAULT_SLIDING_WINDOW_MAX_WEIGHT,
+                Clock.DEFAULT);
     }
 
+    /** @deprecated Use {@link Builder} instead. */
+    @Deprecated
     public LimitBandwidthMeter(Handler eventHandler, EventListener eventListener, int maxWeight) {
+        this(eventHandler, eventListener, DEFAULT_INITIAL_BITRATE_ESTIMATE, maxWeight, Clock.DEFAULT);
+    }
+
+    private LimitBandwidthMeter(
+            @Nullable Handler eventHandler,
+            @Nullable EventListener eventListener,
+            long initialBitrateEstimate,
+            int maxWeight,
+            Clock clock) {
         this.eventHandler = eventHandler;
         this.eventListener = eventListener;
         this.slidingPercentile = new SlidingPercentile(maxWeight);
-        bitrateEstimate = NO_ESTIMATE;
+        this.clock = clock;
+        bitrateEstimate = initialBitrateEstimate;
     }
 
     @Override
@@ -75,7 +180,7 @@ public final class LimitBandwidthMeter implements BandwidthMeter, TransferListen
     @Override
     public synchronized void onTransferStart(Object source, DataSpec dataSpec) {
         if (streamCount == 0) {
-            sampleStartTimeMs = SystemClock.elapsedRealtime();
+            sampleStartTimeMs = clock.elapsedRealtime();
         }
         streamCount++;
     }
@@ -88,7 +193,7 @@ public final class LimitBandwidthMeter implements BandwidthMeter, TransferListen
     @Override
     public synchronized void onTransferEnd(Object source) {
         Assertions.checkState(streamCount > 0);
-        long nowMs = SystemClock.elapsedRealtime();
+        long nowMs = clock.elapsedRealtime();
         int sampleElapsedTimeMs = (int) (nowMs - sampleStartTimeMs);
         totalElapsedTimeMs += sampleElapsedTimeMs;
         totalBytesTransferred += sampleBytesTransferred;
@@ -97,9 +202,7 @@ public final class LimitBandwidthMeter implements BandwidthMeter, TransferListen
             slidingPercentile.addSample((int) Math.sqrt(sampleBytesTransferred), bitsPerSecond);
             if (totalElapsedTimeMs >= ELAPSED_MILLIS_FOR_ESTIMATE
                     || totalBytesTransferred >= BYTES_TRANSFERRED_FOR_ESTIMATE) {
-                float bitrateEstimateFloat = slidingPercentile.getPercentile(0.5f);
-                bitrateEstimate = Float.isNaN(bitrateEstimateFloat) ? NO_ESTIMATE
-                        : (long) bitrateEstimateFloat;
+                bitrateEstimate = (long) slidingPercentile.getPercentile(0.5f);
             }
         }
         notifyBandwidthSample(sampleElapsedTimeMs, sampleBytesTransferred, bitrateEstimate);
@@ -111,7 +214,7 @@ public final class LimitBandwidthMeter implements BandwidthMeter, TransferListen
 
     private void notifyBandwidthSample(final int elapsedMs, final long bytes, final long bitrate) {
         if (eventHandler != null && eventListener != null) {
-            eventHandler.post(new Runnable() {
+            eventHandler.post(new Runnable()  {
                 @Override
                 public void run() {
                     eventListener.onBandwidthSample(elapsedMs, bytes, bitrate);
