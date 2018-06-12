@@ -39,7 +39,7 @@ class AdPlayerController private constructor(
             val companionHeight: Int = 0
     ) {
         fun create(): AdPlayerController {
-            val playerManager = playerManager ?: ExoPlayerManager(context)
+            val playerManager = playerManager ?: ExoPlayerManager.Builder(context).build()
             playerManager.injectView(playerView)
             val sdkFactory: ImaSdkFactory = ImaSdkFactory.getInstance()
             return AdPlayerController(context, language, userAgent,

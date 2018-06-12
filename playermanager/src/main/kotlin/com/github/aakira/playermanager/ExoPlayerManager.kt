@@ -1,13 +1,22 @@
 package com.github.aakira.playermanager
 
 import android.content.Context
-import com.google.android.exoplayer2.BuildConfig
+import com.github.aakira.playermanager.ExoPlayerManager.Builder
+import com.google.android.exoplayer2.DefaultLoadControl
+import com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
+import com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS
+import com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_MAX_BUFFER_MS
+import com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_MIN_BUFFER_MS
+import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayerFactory
+import com.google.android.exoplayer2.LoadControl
 import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.RenderersFactory
 import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.analytics.AnalyticsCollector
 import com.google.android.exoplayer2.analytics.AnalyticsListener
+import com.google.android.exoplayer2.drm.DrmSessionManager
+import com.google.android.exoplayer2.drm.FrameworkMediaCrypto
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.source.ExtractorMediaSource
@@ -24,8 +33,51 @@ import com.google.android.exoplayer2.upstream.TransferListener
 import okhttp3.OkHttpClient
 import java.io.IOException
 
-class ExoPlayerManager(private val context: Context,
-                       private val debugLogger: Boolean = BuildConfig.DEBUG) {
+/**
+ * Create this instance from [Builder.build].
+ */
+class ExoPlayerManager private constructor(
+        private val context: Context,
+        private val debugLogger: Boolean,
+        private val renderersFactory: RenderersFactory,
+        private val loadControl: LoadControl,
+        private val drmSessionManager: DrmSessionManager<FrameworkMediaCrypto>?
+) {
+
+    /**
+     * Build the player manager class
+     */
+    data class Builder(
+            private val context: Context
+    ) {
+
+        /**
+         * Create the [DefaultRenderersFactory]
+         */
+        fun createRenderersFactory(): DefaultRenderersFactory = DefaultRenderersFactory(context)
+
+        /**
+         * Create the [DefaultLoadControl]
+         */
+        fun createDefaultLoadControl(
+                minBufferMs: Int = DEFAULT_MIN_BUFFER_MS,
+                maxBufferMs: Int = DEFAULT_MAX_BUFFER_MS,
+                bufferForPlaybackMs: Int = DEFAULT_BUFFER_FOR_PLAYBACK_MS,
+                bufferForPlaybackAfterRebufferMs: Int = DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
+        ): DefaultLoadControl =
+                DefaultLoadControl.Builder()
+                        .setBufferDurationsMs(minBufferMs, maxBufferMs, bufferForPlaybackMs, bufferForPlaybackAfterRebufferMs)
+                        .createDefaultLoadControl()
+
+        fun build(
+                debugLogger: Boolean = BuildConfig.DEBUG,
+                renderersFactory: RenderersFactory = createRenderersFactory(),
+                loadControl: LoadControl = createDefaultLoadControl(),
+                drmSessionManager: DrmSessionManager<FrameworkMediaCrypto>? = null
+        ): ExoPlayerManager =
+                ExoPlayerManager(context, debugLogger, renderersFactory, loadControl,
+                        drmSessionManager)
+    }
 
     var player: SimpleExoPlayer? = null
         private set
@@ -65,7 +117,7 @@ class ExoPlayerManager(private val context: Context,
                 it.invoke(eventTime, loadEventInfo, mediaLoadData, error, wasCanceled)
             }
         }
-        eventProxy.onMetadataListener = {eventTime, metadata ->
+        eventProxy.onMetadataListener = { eventTime, metadata ->
             onMetadataListeners.forEach { listener -> listener.invoke(eventTime, metadata) }
         }
         eventProxy.onPlaybackParametersChangedListener = {
@@ -84,7 +136,7 @@ class ExoPlayerManager(private val context: Context,
         eventProxy.onTracksChangedListener = {
             onTracksChangedListeners.forEach { listener -> listener.invoke(it) }
         }
-        eventProxy.onVideoSizeChangedListener = { eventTime ,width, height, unappliedRotationDegrees, pixelWidthHeightRatio ->
+        eventProxy.onVideoSizeChangedListener = { eventTime, width, height, unappliedRotationDegrees, pixelWidthHeightRatio ->
             onVideoSizeChangedListeners.forEach {
                 it.invoke(eventTime, width, height, unappliedRotationDegrees, pixelWidthHeightRatio)
             }
@@ -382,8 +434,9 @@ class ExoPlayerManager(private val context: Context,
     }
 
     private fun initializePlayer() {
-        AnalyticsCollector.Factory()
-        player = ExoPlayerFactory.newSimpleInstance(context, trackSelector).apply {
+        player = ExoPlayerFactory.newSimpleInstance(renderersFactory, trackSelector, loadControl,
+                drmSessionManager).apply {
+
             addListener(eventProxy)
             addAnalyticsListener(eventProxy)
 

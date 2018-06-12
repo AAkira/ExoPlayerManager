@@ -40,7 +40,18 @@ This is written in Kotlin.
 // inject from xml
 val playerView: PlayerView by bindView(R.id.playerView)
 
-val playerManager: ExoPlayerManager = ExoPlayerManager(context) 
+val playerManager: ExoPlayerManager = ExoPlayerManager.Builder(context).run {
+            build(
+                    renderersFactory = createRenderersFactory(), // You can set your RenderersFactory
+                    loadControl = createDefaultLoadControl(      // You can set your LoadControl  
+                            minBufferMs = 15000,
+                            maxBufferMs = 50000,
+                            bufferForPlaybackMs = 2500,
+                            bufferForPlaybackAfterRebufferMs = 5000
+                    ),
+                    drmSessionManager = null                     // You can set your drmSessionManager 
+            )
+        }
 
 // inject PlayerView
 playerManager.injectView(playerView)
@@ -145,8 +156,8 @@ buildscript {
 }
 
 dependencies {
-	implementation 'com.github.aakira:exoplayer-manager:0.12.0@aar'
-	implementation 'com.github.aakira:exoplayer-manager-ima:0.12.0@aar' // if you use an IMA SDK
+	implementation 'com.github.aakira:exoplayer-manager:0.13.0@aar'
+	implementation 'com.github.aakira:exoplayer-manager-ima:0.13.0@aar' // if you use an IMA SDK
 }
 ```
 ## Using libraries
