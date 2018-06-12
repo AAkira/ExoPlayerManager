@@ -1,12 +1,16 @@
 package com.github.aakira.playermanager
 
 import android.content.Context
-import com.google.android.exoplayer2.BuildConfig
+import com.google.android.exoplayer2.DefaultLoadControl
+import com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
+import com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS
+import com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_MAX_BUFFER_MS
+import com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_MIN_BUFFER_MS
+import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.analytics.AnalyticsCollector
 import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
@@ -65,7 +69,7 @@ class ExoPlayerManager(private val context: Context,
                 it.invoke(eventTime, loadEventInfo, mediaLoadData, error, wasCanceled)
             }
         }
-        eventProxy.onMetadataListener = {eventTime, metadata ->
+        eventProxy.onMetadataListener = { eventTime, metadata ->
             onMetadataListeners.forEach { listener -> listener.invoke(eventTime, metadata) }
         }
         eventProxy.onPlaybackParametersChangedListener = {
@@ -84,7 +88,7 @@ class ExoPlayerManager(private val context: Context,
         eventProxy.onTracksChangedListener = {
             onTracksChangedListeners.forEach { listener -> listener.invoke(it) }
         }
-        eventProxy.onVideoSizeChangedListener = { eventTime ,width, height, unappliedRotationDegrees, pixelWidthHeightRatio ->
+        eventProxy.onVideoSizeChangedListener = { eventTime, width, height, unappliedRotationDegrees, pixelWidthHeightRatio ->
             onVideoSizeChangedListeners.forEach {
                 it.invoke(eventTime, width, height, unappliedRotationDegrees, pixelWidthHeightRatio)
             }
@@ -382,8 +386,18 @@ class ExoPlayerManager(private val context: Context,
     }
 
     private fun initializePlayer() {
-        AnalyticsCollector.Factory()
-        player = ExoPlayerFactory.newSimpleInstance(context, trackSelector).apply {
+        val defaultLoadControl = DefaultLoadControl.Builder()
+                .setBufferDurationsMs(
+                        DEFAULT_MIN_BUFFER_MS,
+                        DEFAULT_MAX_BUFFER_MS,
+                        DEFAULT_BUFFER_FOR_PLAYBACK_MS,
+                        DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
+                )
+                .createDefaultLoadControl()
+
+        player = ExoPlayerFactory.newSimpleInstance(DefaultRenderersFactory(context), trackSelector,
+                defaultLoadControl).apply {
+
             addListener(eventProxy)
             addAnalyticsListener(eventProxy)
 
