@@ -40,7 +40,7 @@ This is written in Kotlin.
 // inject from xml
 val playerView: PlayerView by bindView(R.id.playerView)
 
-val playerManager: ExoPlayerManager = ExoPlayerManager.Builder(this).run {
+val playerManager: ExoPlayerManager = ExoPlayerManager.Builder(context).run {
             build(
                     renderersFactory = createRenderersFactory(), // You can set your RenderersFactory
                     loadControl = createDefaultLoadControl(      // You can set your LoadControl  
