@@ -27,7 +27,9 @@ class AdActivity : Activity() {
 
     private val adUiContainer: FrameLayout by bindView(R.id.adUiContainer)
     private val playerView: PlayerView by bindView(R.id.player_view)
-    private val playerManager: ExoPlayerManager by lazy(LazyThreadSafetyMode.NONE) { ExoPlayerManager(this) }
+    private val playerManager: ExoPlayerManager by lazy(LazyThreadSafetyMode.NONE) {
+        ExoPlayerManager.Builder(this).build()
+    }
     private val adPlayerController: AdPlayerController by lazy(LazyThreadSafetyMode.NONE) {
         AdPlayerController.Builder(
                 context = this,

@@ -30,7 +30,17 @@ class PlayerActivity : Activity() {
     private val reconnectButton: Button by bindView(R.id.reconnectButton)
     private val stopButton: Button by bindView(R.id.stopButton)
 
-    private val playerManager: ExoPlayerManager by lazy(LazyThreadSafetyMode.NONE) { ExoPlayerManager(this) }
+    private val playerManager: ExoPlayerManager by lazy(LazyThreadSafetyMode.NONE) {
+        ExoPlayerManager.Builder(this).run {
+            build(
+                    renderersFactory = createRenderersFactory(),
+                    loadControl = createDefaultLoadControl(
+                            minBufferMs = 15000,
+                            maxBufferMs = 50000
+                    )
+            )
+        }
+    }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
