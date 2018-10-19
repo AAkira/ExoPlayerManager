@@ -13,6 +13,10 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
@@ -35,7 +39,13 @@ dependencies {
     implementation project(':playermanager')
     implementation project(':ima')
 
-    implementation "com.android.support:appcompat-v7:$APP_COMPAT_VERSION"
+    // overwrite support libraries
+    implementation "com.android.support:support-fragment:$APP_COMPAT_VERSION"
+    implementation "com.android.support:customtabs:$APP_COMPAT_VERSION"
+    implementation "com.android.support:recyclerview-v7:$APP_COMPAT_VERSION"
+    implementation "com.android.support:support-v4:$APP_COMPAT_VERSION"
+    implementation "com.android.support:support-compat:$APP_COMPAT_VERSION"
+    implementation "com.android.support:support-annotations:$APP_COMPAT_VERSION"
 
     // exo palyer
     implementation "com.google.android.exoplayer:exoplayer:$EXO_PLAYER_VERSION"

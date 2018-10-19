@@ -2,18 +2,8 @@ package com.github.aakira.playermanager
 
 import android.content.Context
 import com.github.aakira.playermanager.ExoPlayerManager.Builder
-import com.google.android.exoplayer2.DefaultLoadControl
-import com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
-import com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS
-import com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_MAX_BUFFER_MS
-import com.google.android.exoplayer2.DefaultLoadControl.DEFAULT_MIN_BUFFER_MS
-import com.google.android.exoplayer2.DefaultRenderersFactory
-import com.google.android.exoplayer2.ExoPlayerFactory
-import com.google.android.exoplayer2.LoadControl
-import com.google.android.exoplayer2.PlaybackParameters
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.RenderersFactory
-import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.DefaultLoadControl.*
 import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.drm.DrmSessionManager
 import com.google.android.exoplayer2.drm.FrameworkMediaCrypto
@@ -26,10 +16,10 @@ import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.upstream.TransferListener
+import com.google.android.exoplayer2.util.EventLogger
 import okhttp3.OkHttpClient
 import java.io.IOException
 
@@ -175,7 +165,7 @@ class ExoPlayerManager private constructor(
 
         mediaSource = HlsMediaSource.Factory(
                 dataSourceCreator.dataSourceCreatorInterface?.let {
-                    dataSourceCreator.dataSourceCreatorInterface.create(context, bandwidthMeter, dataSource)
+                    dataSourceCreator.dataSourceCreatorInterface.create(context, dataSource)
                 } ?: dataSource
         )
                 .createMediaSource(dataSourceCreator.uri)
@@ -203,7 +193,7 @@ class ExoPlayerManager private constructor(
 
         mediaSource = ExtractorMediaSource.Factory(
                 dataSourceCreator.dataSourceCreatorInterface?.let {
-                    dataSourceCreator.dataSourceCreatorInterface.create(context, bandwidthMeter, dataSource)
+                    dataSourceCreator.dataSourceCreatorInterface.create(context, dataSource)
                 } ?: dataSource
         )
                 .setExtractorsFactory(DefaultExtractorsFactory())
@@ -240,7 +230,9 @@ class ExoPlayerManager private constructor(
     }
 
     /**
-     * init player and reconnect to a video stream
+     * init player and reconnect to a video stream immediately
+     * this method is not different from [ExoPlayer.retry] that is since ExoPlayer2.9.0
+     * write `playerManager.player?.retry()` if you want use it in your code
      */
     fun restart() {
         player?.release()
@@ -434,7 +426,7 @@ class ExoPlayerManager private constructor(
     }
 
     private fun initializePlayer() {
-        player = ExoPlayerFactory.newSimpleInstance(renderersFactory, trackSelector, loadControl,
+        player = ExoPlayerFactory.newSimpleInstance(context, renderersFactory, trackSelector, loadControl,
                 drmSessionManager).apply {
 
             addListener(eventProxy)
@@ -463,20 +455,20 @@ class ExoPlayerManager private constructor(
     }
 
     private fun buildDataSourceFactory(userAgent: String,
-                                       bandwidthMeter: TransferListener<in DataSource>,
+                                       bandwidthMeter: TransferListener,
                                        okHttpClient: OkHttpClient?) = okHttpClient?.let {
         buildOkHttpDataSourceFactory(userAgent, bandwidthMeter, okHttpClient)
     } ?: buildDefaultHttpDataSourceFactory(userAgent, bandwidthMeter)
 
     private fun buildDefaultHttpDataSourceFactory(userAgent: String,
-                                                  listener: TransferListener<in DataSource>,
+                                                  listener: TransferListener,
                                                   allowCrossProtocolRedirects: Boolean = false) =
             DefaultHttpDataSourceFactory(userAgent, listener,
                     DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS,
                     DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS, allowCrossProtocolRedirects)
 
     private fun buildOkHttpDataSourceFactory(userAgent: String,
-                                             listener: TransferListener<in DataSource>,
+                                             listener: TransferListener,
                                              okHttpClient: OkHttpClient) =
             OkHttpDataSourceFactory(okHttpClient, userAgent, listener)
 }

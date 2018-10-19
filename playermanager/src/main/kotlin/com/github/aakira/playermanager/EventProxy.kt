@@ -1,13 +1,7 @@
 package com.github.aakira.playermanager
 
-import android.net.NetworkInfo
 import android.view.Surface
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlaybackException
-import com.google.android.exoplayer2.Format
-import com.google.android.exoplayer2.PlaybackParameters
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.Timeline
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.analytics.AnalyticsListener
 import com.google.android.exoplayer2.decoder.DecoderCounters
 import com.google.android.exoplayer2.metadata.Metadata
@@ -15,9 +9,8 @@ import com.google.android.exoplayer2.source.MediaSourceEventListener
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import java.io.IOException
-import java.lang.Exception
 
-class EventProxy : Player.DefaultEventListener(), AnalyticsListener {
+class EventProxy : Player.EventListener, AnalyticsListener {
 
     var onTracksChangedListener: TracksChangedListener? = null
     var onPlayerStateChangedListener: PlayerStateChangedListener? = null
@@ -281,16 +274,6 @@ class EventProxy : Player.DefaultEventListener(), AnalyticsListener {
     // AnalyticsListener
     override fun onBandwidthEstimate(eventTime: AnalyticsListener.EventTime?, totalLoadTimeMs: Int,
                                      totalBytesLoaded: Long, bitrateEstimate: Long) {
-    }
-
-    // AnalyticsListener
-    override fun onNetworkTypeChanged(eventTime: AnalyticsListener.EventTime?,
-                                      networkInfo: NetworkInfo?) {
-    }
-
-    // AnalyticsListener
-    override fun onViewportSizeChange(eventTime: AnalyticsListener.EventTime?, width: Int,
-                                      height: Int) {
     }
 
     // AnalyticsListener
