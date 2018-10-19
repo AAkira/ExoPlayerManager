@@ -165,7 +165,7 @@ class ExoPlayerManager private constructor(
 
         mediaSource = HlsMediaSource.Factory(
                 dataSourceCreator.dataSourceCreatorInterface?.let {
-                    dataSourceCreator.dataSourceCreatorInterface.create(context, bandwidthMeter, dataSource)
+                    dataSourceCreator.dataSourceCreatorInterface.create(context, dataSource)
                 } ?: dataSource
         )
                 .createMediaSource(dataSourceCreator.uri)
@@ -193,7 +193,7 @@ class ExoPlayerManager private constructor(
 
         mediaSource = ExtractorMediaSource.Factory(
                 dataSourceCreator.dataSourceCreatorInterface?.let {
-                    dataSourceCreator.dataSourceCreatorInterface.create(context, bandwidthMeter, dataSource)
+                    dataSourceCreator.dataSourceCreatorInterface.create(context, dataSource)
                 } ?: dataSource
         )
                 .setExtractorsFactory(DefaultExtractorsFactory())

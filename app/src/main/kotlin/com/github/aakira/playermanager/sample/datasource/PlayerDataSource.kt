@@ -7,12 +7,7 @@ import com.google.android.exoplayer2.util.Assertions
 import com.google.android.exoplayer2.util.Util
 import java.io.IOException
 
-class PlayerDataSource(context: Context, listener: TransferListener?,
-                       private var baseDataSource: DataSource) : DataSource {
-
-    init {
-        addTransferListener(listener)
-    }
+class PlayerDataSource(context: Context, private var baseDataSource: DataSource) : DataSource {
 
     private var dataSource: DataSource? = null
     private val fileDataSource: DataSource = FileDataSource()
