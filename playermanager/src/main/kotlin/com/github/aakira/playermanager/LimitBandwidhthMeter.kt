@@ -6,7 +6,7 @@ import com.google.android.exoplayer2.upstream.TransferListener
 
 class LimitBandwidthMeter(
         private val default: DefaultBandwidthMeter = DefaultBandwidthMeter()
-) : BandwidthMeter by default, TransferListener<Any> by default {
+) : BandwidthMeter by default, TransferListener by default {
 
     private var limitBitrate = Long.MAX_VALUE
 

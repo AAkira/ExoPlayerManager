@@ -4,7 +4,7 @@ import android.content.Context
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.TransferListener
 
-class CustomDataSourceFactory(val context: Context, val listener: TransferListener<in DataSource>,
+class CustomDataSourceFactory(val context: Context, val listener: TransferListener,
                               val dataSourceFactory: DataSource.Factory) : DataSource.Factory {
 
     override fun createDataSource(): DataSource {

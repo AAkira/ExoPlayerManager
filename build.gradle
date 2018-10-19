@@ -7,16 +7,16 @@ buildscript {
     ext.LIBRARY_VERSION_NAME = "0.13.0"
 
     // App information
-    ext.COMPILE_SDK_VERSION = 27
-    ext.BUILD_TOOLS_VERSION = "27.0.3"
+    ext.COMPILE_SDK_VERSION = 28
+    ext.BUILD_TOOLS_VERSION = "28.0.3"
     ext.MIN_SDK_VERSION = 16
-    ext.TARGET_SDK_VERSION = 25
+    ext.TARGET_SDK_VERSION = 28
 
     // Using libraries
 
     // Base libraries
     ext.KOTLIN_VERSION = "1.2.30"
-    ext.EXO_PLAYER_VERSION = "2.8.1"
+    ext.EXO_PLAYER_VERSION = "2.9.0"
     ext.IMA_VERSION = "3.7.2"
 
     // Others

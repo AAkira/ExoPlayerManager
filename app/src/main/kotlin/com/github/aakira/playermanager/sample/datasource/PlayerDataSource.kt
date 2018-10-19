@@ -2,23 +2,29 @@ package com.github.aakira.playermanager.sample.datasource
 
 import android.content.Context
 import android.net.Uri
-import com.google.android.exoplayer2.upstream.AssetDataSource
-import com.google.android.exoplayer2.upstream.ContentDataSource
-import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DataSpec
-import com.google.android.exoplayer2.upstream.FileDataSource
-import com.google.android.exoplayer2.upstream.TransferListener
+import com.google.android.exoplayer2.upstream.*
 import com.google.android.exoplayer2.util.Assertions
 import com.google.android.exoplayer2.util.Util
 import java.io.IOException
 
-class PlayerDataSource(context: Context, listener: TransferListener<in DataSource>?,
+class PlayerDataSource(context: Context, listener: TransferListener?,
                        private var baseDataSource: DataSource) : DataSource {
 
+    init {
+        addTransferListener(listener)
+    }
+
     private var dataSource: DataSource? = null
-    private val fileDataSource: DataSource by lazy { FileDataSource(listener) }
-    private val assetDataSource: DataSource by lazy { AssetDataSource(context, listener) }
-    private val contentDataSource: DataSource by lazy { ContentDataSource(context, listener) }
+    private val fileDataSource: DataSource = FileDataSource()
+    private val assetDataSource: DataSource = AssetDataSource(context)
+    private val contentDataSource: DataSource = ContentDataSource(context)
+
+    override fun addTransferListener(transferListener: TransferListener?) {
+        baseDataSource.addTransferListener(transferListener)
+        fileDataSource.addTransferListener(transferListener)
+        assetDataSource.addTransferListener(transferListener)
+        contentDataSource.addTransferListener(transferListener)
+    }
 
     @Throws(IOException::class)
     override fun open(dataSpec: DataSpec): Long {
