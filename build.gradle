@@ -20,8 +20,8 @@ buildscript {
     ext.IMA_VERSION = "3.7.2"
 
     // Others
-    ext.APP_COMPAT_VERSION = "27.0.2"
-    ext.PLAY_SERVICE_VERSION = "11.2.0"
+    ext.APP_COMPAT_VERSION = "27.1.1"
+    ext.PLAY_SERVICE_VERSION = "16.0.0"
     ext.KOTTER_KNIFE_VERSION = "0.1.0-SNAPSHOT"
     ext.TIMBER_VERSION = "4.3.1@aar"
 

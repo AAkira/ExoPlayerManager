@@ -26,6 +26,12 @@ afterEvaluate {
 dependencies {
     implementation project(':playermanager')
 
+    // overwrite support libraries
+    implementation "com.android.support:support-v4:$APP_COMPAT_VERSION"
+    implementation "com.android.support:support-compat:$APP_COMPAT_VERSION"
+    implementation "com.android.support:support-annotations:$APP_COMPAT_VERSION"
+    implementation "com.android.support:customtabs:$APP_COMPAT_VERSION"
+
     // kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
 
